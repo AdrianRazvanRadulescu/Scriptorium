@@ -10,12 +10,22 @@ import Database from 'better-sqlite3'
 import { openIndex } from './db/search-index'
 
 let mainWindow: BrowserWindow | null = null
-let db: Database.Database | null = null
 
 async function initDatabase(libraryRoot: string): Promise<Database.Database> {
   const indexDir = path.join(libraryRoot, '.index')
   await fs.mkdir(indexDir, { recursive: true })
   return openIndex(libraryRoot)
+}
+
+// Send a message to the renderer, waiting for the page to be ready if needed.
+function sendToRenderer(channel: string, payload: unknown): void {
+  if (!mainWindow) return
+  const wc = mainWindow.webContents
+  if (wc.isLoading()) {
+    wc.once('did-finish-load', () => wc.send(channel, payload))
+  } else {
+    wc.send(channel, payload)
+  }
 }
 
 function createWindow(): void {
@@ -26,13 +36,14 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     backgroundColor: '#12110F',
-    titleBarStyle: 'hidden',
-    frame: process.platform !== 'win32',
+    // Use native frame on all platforms — gives close/min/max buttons.
+    // Custom frameless chrome can be added later once core functionality works.
+    frame: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      // sandbox:false is required for better-sqlite3 native module to load
+      // sandbox:false is required for better-sqlite3 native module to load in preload context
       sandbox: false,
     },
   })
@@ -51,30 +62,30 @@ app.whenReady().then(async () => {
 
   const config = await readConfig()
 
-  // Force dark OS chrome so window decorations match our near-black canvas.
   nativeTheme.themeSource = 'dark'
 
+  let db: Database.Database | null = null
   try {
     db = await initDatabase(config.libraryRoot)
-    registerIpcHandlers(db)
   } catch {
-    // Library missing or unreadable — handlers will surface the error to the renderer.
-    registerIpcHandlers(null as unknown as Database.Database)
+    // Library root missing or unreadable; db stays null. Handlers guard against null db.
   }
+  registerIpcHandlers(db)
 
   createWindow()
 
-  const validation = await validateLibraryRoot(config.libraryRoot)
-  if (!validation.ok && mainWindow) {
-    mainWindow.webContents.on('did-finish-load', () => {
-      mainWindow!.webContents.send('drive:status', {
-        available: false,
-        libraryRoot: config.libraryRoot,
-      })
-    })
-  }
+  // Validate library root and notify renderer. sendToRenderer() handles the timing
+  // race between this check completing and the page finishing its initial load.
+  validateLibraryRoot(config.libraryRoot).then(validation => {
+    if (!validation.ok) {
+      sendToRenderer('drive:status', { available: false, libraryRoot: config.libraryRoot })
+    }
+    if (validation.syncWarning) {
+      sendToRenderer('drive:status', { available: true, syncWarning: validation.syncWarning, libraryRoot: config.libraryRoot })
+    }
+  })
 
-  // Background backup — non-blocking, failures are warnings not errors
+  // Background backup — non-blocking, failures are logged not thrown
   shouldRunBackup(config.backupRoot).then(needed => {
     if (needed) runBackup(config.libraryRoot, config.backupRoot).catch(console.warn)
   })
@@ -85,6 +96,6 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
-  // Signal renderer to flush any pending scene saves before process exits.
+  // Signal renderer to flush any pending scene saves before the process exits.
   mainWindow?.webContents.send('app:quitting')
 })

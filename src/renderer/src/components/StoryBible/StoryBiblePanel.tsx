@@ -19,10 +19,10 @@ interface BibleData {
 
 const EMPTY_BIBLE: BibleData = { characters: [], places: [], notes: [] }
 
-const TABS: Array<{ key: Tab; label: string }> = [
-  { key: 'characters', label: 'Characters' },
-  { key: 'places', label: 'Places' },
-  { key: 'notes', label: 'Notes' },
+const TABS: Array<{ key: Tab; label: string; newLabel: string }> = [
+  { key: 'characters', label: 'Characters', newLabel: 'New character' },
+  { key: 'places', label: 'Places', newLabel: 'New place' },
+  { key: 'notes', label: 'Notes', newLabel: 'New note' },
 ]
 
 export default function StoryBiblePanel() {
@@ -55,10 +55,14 @@ export default function StoryBiblePanel() {
   }
 
   const entries = data[activeTab]
-  const selectedEntry = selectedId !== null ? (entries.find((e) => e.id === selectedId) ?? null) : null
+  const selectedEntry =
+    selectedId !== null ? (entries.find((e) => e.id === selectedId) ?? null) : null
 
   const updateEntry = (updated: BibleEntry) => {
-    const next = { ...data, [activeTab]: data[activeTab].map((e) => (e.id === updated.id ? updated : e)) }
+    const next = {
+      ...data,
+      [activeTab]: data[activeTab].map((e) => (e.id === updated.id ? updated : e)),
+    }
     setData(next)
     scheduleSave(next)
   }
@@ -83,10 +87,16 @@ export default function StoryBiblePanel() {
     setSelectedId(null)
   }
 
+  const activeTabDef = TABS.find((t) => t.key === activeTab)!
+
   return (
     <aside
       className='flex flex-col h-full shrink-0 border-l'
-      style={{ width: '380px', background: 'var(--color-chrome)', borderColor: 'var(--color-border)' }}
+      style={{
+        width: '380px',
+        background: 'var(--color-chrome)',
+        borderColor: 'var(--color-border)',
+      }}
     >
       <div className='flex border-b' style={{ borderColor: 'var(--color-border)' }}>
         {TABS.map(({ key, label }) => (
@@ -116,7 +126,8 @@ export default function StoryBiblePanel() {
                 className='w-full text-left px-3 py-2 text-xs font-ui truncate border-b'
                 style={{
                   borderColor: 'var(--color-border)',
-                  background: selectedId === entry.id ? 'var(--color-selection)' : 'transparent',
+                  background:
+                    selectedId === entry.id ? 'var(--color-selection)' : 'transparent',
                   color: selectedId === entry.id ? 'var(--color-prose)' : 'var(--color-dim)',
                 }}
                 onClick={() => setSelectedId(entry.id)}
@@ -132,14 +143,16 @@ export default function StoryBiblePanel() {
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-dim)' }}
               onClick={addEntry}
             >
-              New entry
+              {activeTabDef.newLabel}
             </button>
           </div>
         </div>
 
         <div className='flex flex-col flex-1 overflow-hidden'>
           {selectedEntry === null ? (
-            <p className='m-auto text-xs font-ui text-dim'>Select an entry</p>
+            <p className='m-auto text-xs font-ui' style={{ color: 'var(--color-dim)' }}>
+              Select an entry
+            </p>
           ) : (
             <>
               <div

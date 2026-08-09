@@ -10,11 +10,9 @@ const SAVE_DOT_COLOR: Record<string, string> = {
 }
 
 export default function StatusBar(): JSX.Element {
-  const { saveStatus, selectedNodeId, currentProject } = useAppStore(s => ({
-    saveStatus: s.saveStatus,
-    selectedNodeId: s.selectedNodeId,
-    currentProject: s.currentProject,
-  }))
+  const saveStatus = useAppStore(s => s.saveStatus)
+  const selectedNodeId = useAppStore(s => s.selectedNodeId)
+  const currentProject = useAppStore(s => s.currentProject)
   const { sceneWordCount, sessionWordsAtOpen, projectWordCount } = useEditorStore()
 
   const selectedNode = selectedNodeId && currentProject

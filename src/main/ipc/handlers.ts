@@ -17,7 +17,7 @@ import { searchIndex, upsertDocument, rebuildIndex } from '../db/search-index'
 import { writeCrashJournal, readCrashJournal, clearCrashJournal } from '../crash-journal'
 import { compileProject } from '../compiler'
 
-export function registerIpcHandlers(db: Database.Database): void {
+export function registerIpcHandlers(db: Database.Database | null): void {
   ipcMain.handle('config:get', async () => readConfig())
 
   ipcMain.handle('config:set', async (_e, patch: Partial<AppConfig>) => patchConfig(patch))
@@ -67,7 +67,7 @@ export function registerIpcHandlers(db: Database.Database): void {
       try {
         const pf = await readProjectFile(projectDir)
         const node = Object.values(pf.nodes).find(n => n.sceneFile === sceneFile)
-        if (node !== undefined) {
+        if (node !== undefined && db !== null) {
           upsertDocument(db, {
             projectId: pf.meta.id,
             projectDir,
@@ -120,9 +120,12 @@ export function registerIpcHandlers(db: Database.Database): void {
     return restoreFromTrash(config.libraryRoot, name)
   })
 
-  ipcMain.handle('search:query', async (_e, query: SearchQuery) => searchIndex(db, query))
+  ipcMain.handle('search:query', async (_e, query: SearchQuery) =>
+    db ? searchIndex(db, query) : []
+  )
 
   ipcMain.handle('search:rebuild', async () => {
+    if (!db) return
     const config = await readConfig()
     return rebuildIndex(config.libraryRoot, db)
   })

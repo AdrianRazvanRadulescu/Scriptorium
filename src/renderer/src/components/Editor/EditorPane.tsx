@@ -16,8 +16,16 @@ export default function EditorPane(): JSX.Element | null {
   const currentProject = useAppStore((s) => s.currentProject)
   const selectedNodeId = useAppStore((s) => s.selectedNodeId)
 
+  // Stable primitive: only changes when the user opens a different project.
+  // Using this instead of the full currentProject object means node edits
+  // (rename, status, synopsis) do not retrigger the scene-load effect.
+  const projectDir = currentProject?.projectDir ?? null
+
   const containerRef = useRef<HTMLDivElement>(null)
   const editorViewRef = useRef<EditorView | null>(null)
+  // True while we are programmatically loading content into CodeMirror.
+  // Prevents the updateListener from marking a freshly-loaded scene as dirty.
+  const isLoadingRef = useRef(false)
 
   // Both callbacks use getState() so they never capture stale closure values.
   // This lets the editor be created once without extensions going out of date.
@@ -40,6 +48,8 @@ export default function EditorPane(): JSX.Element | null {
   }, [])
 
   const handleUpdate = useCallback((content: string) => {
+    // Skip when we are loading content from disk — that is not a user edit.
+    if (isLoadingRef.current) return
     useEditorStore.getState().setContent(content)
     useEditorStore.getState().setSceneWordCount(countWords(content))
     useAppStore.getState().setDirty(true)
@@ -84,11 +94,16 @@ export default function EditorPane(): JSX.Element | null {
   }, [config?.smartTypography, config?.typewriterScrolling, handleUpdate, triggerSave])
 
   // Load scene content whenever the user selects a different scene.
+  // Deps are stable primitives: selectedNodeId (string | null) and projectDir (string | null).
+  // We intentionally do NOT depend on the full currentProject object — that reference
+  // changes on every updateProjectNodes call (node rename, status edit, etc.), which
+  // would reload the scene from disk on every node change and cause a render loop.
   useEffect(() => {
-    if (!currentProject || !selectedNodeId) return
-    const node = currentProject.nodes[selectedNodeId]
+    if (!projectDir || !selectedNodeId) return
+    const { currentProject: proj } = useAppStore.getState()
+    if (!proj) return
+    const node = proj.nodes[selectedNodeId]
     if (node?.type !== 'scene' || !node.sceneFile) return
-    const { projectDir } = currentProject
     const sceneFile = node.sceneFile
 
     const load = async () => {
@@ -112,14 +127,17 @@ export default function EditorPane(): JSX.Element | null {
 
       const view = editorViewRef.current
       if (!view) return
+      // Guard: dispatch to CodeMirror without triggering the autosave/dirty path.
+      isLoadingRef.current = true
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: diskContent },
         selection: { anchor: 0 },
       })
+      isLoadingRef.current = false
     }
 
     void load()
-  }, [selectedNodeId, currentProject])
+  }, [selectedNodeId, projectDir])
 
   // focusMode dims non-active lines via CSS; no editor recreation needed.
   useEffect(() => {
