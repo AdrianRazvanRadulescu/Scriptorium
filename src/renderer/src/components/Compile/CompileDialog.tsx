@@ -15,9 +15,26 @@ export default function CompileDialog({ onClose }: Props): JSX.Element {
   const [outputPath, setOutputPath] = useState('')
   const [error, setError] = useState('')
   const [exporting, setExporting] = useState(false)
+  const [title, setTitle] = useState(currentProject?.meta.title ?? '')
+  const [author, setAuthor] = useState(currentProject?.meta.author ?? '')
+
+  const saveMetaIfChanged = async () => {
+    if (currentProject === null) return
+    const titleChanged = title.trim() !== currentProject.meta.title
+    const authorChanged = author.trim() !== currentProject.meta.author
+    if (!titleChanged && !authorChanged) return
+    const updatedMeta = { ...currentProject.meta, title: title.trim(), author: author.trim(), updatedAt: new Date().toISOString() }
+    await window.api.saveProjectTree(currentProject.projectDir, {
+      meta: updatedMeta, nodes: currentProject.nodes, version: 1,
+    })
+    useAppStore.setState(s =>
+      s.currentProject ? { ...s, currentProject: { ...s.currentProject, meta: updatedMeta } } : s
+    )
+  }
 
   const handleExport = async () => {
     if (currentProject === null) return
+    await saveMetaIfChanged()
     setExporting(true)
     setError('')
     try {
@@ -29,8 +46,8 @@ export default function CompileDialog({ onClose }: Props): JSX.Element {
         includePartTitlePages,
         sceneSeparator,
         includeTitlePage,
-        title: currentProject.meta.title,
-        author: currentProject.meta.author,
+        title: title.trim() || currentProject.meta.title,
+        author: author.trim(),
       })
       setOutputPath(result.outputPath)
     } catch (e) {
@@ -55,6 +72,24 @@ export default function CompileDialog({ onClose }: Props): JSX.Element {
           Export / Compile
         </h3>
         <div className='flex flex-col gap-3 text-xs' style={{ color: 'var(--color-dim)' }}>
+          <label>
+            Title
+            <input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className='mt-1 w-full px-2 py-1 rounded text-xs block'
+              style={{ background: 'var(--color-page)', color: 'var(--color-prose)', border: '1px solid var(--color-border)' }}
+            />
+          </label>
+          <label>
+            Author
+            <input
+              value={author}
+              onChange={e => setAuthor(e.target.value)}
+              className='mt-1 w-full px-2 py-1 rounded text-xs block'
+              style={{ background: 'var(--color-page)', color: 'var(--color-prose)', border: '1px solid var(--color-border)' }}
+            />
+          </label>
           <label>
             Format
             <div className='flex gap-2 mt-1'>

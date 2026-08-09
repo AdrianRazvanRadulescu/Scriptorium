@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { v4 as uuid } from 'uuid'
 import useAppStore from '../../store/app-store'
 import BinderNode from './BinderNode'
@@ -8,6 +8,9 @@ import type { ProjectNode, ProjectFile } from '@shared/types'
 export default function BinderPanel(): JSX.Element {
   const { currentProject, selectedNodeId, updateProjectNodes } = useAppStore()
   const [isCreating, setIsCreating] = useState(false)
+  const [renamingProject, setRenamingProject] = useState(false)
+  const [renameValue, setRenameValue] = useState('')
+  const renameRef = useRef<HTMLInputElement>(null)
 
   if (!currentProject) {
     return (
@@ -26,6 +29,24 @@ export default function BinderPanel(): JSX.Element {
     updateProjectNodes(updated)
     const file: ProjectFile = { meta, nodes: updated, version: 1 }
     await window.api.saveProjectTree(projectDir, file)
+  }
+
+  const startProjectRename = () => {
+    setRenameValue(meta.title)
+    setRenamingProject(true)
+    setTimeout(() => renameRef.current?.select(), 0)
+  }
+
+  const commitProjectRename = async () => {
+    setRenamingProject(false)
+    const title = renameValue.trim()
+    if (!title || title === meta.title) return
+    const updatedMeta = { ...meta, title, updatedAt: new Date().toISOString() }
+    await window.api.saveProjectTree(projectDir, { meta: updatedMeta, nodes, version: 1 })
+    // Update meta in the store without resetting selectedNodeId (setCurrentProject would do that)
+    useAppStore.setState(s =>
+      s.currentProject ? { ...s, currentProject: { ...s.currentProject, meta: updatedMeta } } : s
+    )
   }
 
   const getParentId = (): string => {
@@ -93,13 +114,30 @@ export default function BinderPanel(): JSX.Element {
         className='flex items-center justify-between px-3 py-2 shrink-0'
         style={{ borderBottom: '1px solid var(--color-border)' }}
       >
-        <span
-          className='text-xs font-medium truncate'
-          style={{ color: 'var(--color-dim)' }}
-          title={meta.title}
-        >
-          {meta.title}
-        </span>
+        {renamingProject ? (
+          <input
+            ref={renameRef}
+            value={renameValue}
+            onChange={e => setRenameValue(e.target.value)}
+            onBlur={commitProjectRename}
+            onClick={e => e.stopPropagation()}
+            onKeyDown={e => {
+              if (e.key === 'Enter') commitProjectRename()
+              if (e.key === 'Escape') setRenamingProject(false)
+            }}
+            className='flex-1 text-xs bg-transparent outline-none min-w-0 truncate'
+            style={{ color: 'var(--color-prose)', boxShadow: '0 0 0 1px var(--color-accent)', borderRadius: 2 }}
+          />
+        ) : (
+          <span
+            className='text-xs font-medium truncate flex-1 min-w-0'
+            style={{ color: 'var(--color-dim)', cursor: 'default' }}
+            title={`${meta.title} — double-click to rename`}
+            onDoubleClick={startProjectRename}
+          >
+            {meta.title}
+          </span>
+        )}
         <div className='flex gap-1 shrink-0'>
           <button
             onClick={createScene}
