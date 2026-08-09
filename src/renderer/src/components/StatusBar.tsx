@@ -13,6 +13,8 @@ export default function StatusBar(): JSX.Element {
   const saveStatus = useAppStore(s => s.saveStatus)
   const selectedNodeId = useAppStore(s => s.selectedNodeId)
   const currentProject = useAppStore(s => s.currentProject)
+  const rightPanel = useAppStore(s => s.rightPanel)
+  const setRightPanel = useAppStore(s => s.setRightPanel)
   const { sceneWordCount, sessionWordsAtOpen, projectWordCount } = useEditorStore()
 
   const selectedNode = selectedNodeId && currentProject
@@ -58,7 +60,7 @@ export default function StatusBar(): JSX.Element {
         )}
       </div>
 
-      <div className='flex items-center gap-2'>
+      <div className='flex items-center gap-3'>
         <span>{saveText}</span>
         <span
           className={`w-2 h-2 rounded-full${saveStatus === 'saving' ? ' animate-pulse' : ''}`}
@@ -68,6 +70,17 @@ export default function StatusBar(): JSX.Element {
             transition: 'opacity 400ms ease',
           }}
         />
+        <button
+          onClick={() => setRightPanel(rightPanel === 'settings' ? 'none' : 'settings')}
+          title='Settings'
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            color: rightPanel === 'settings' ? 'var(--color-prose)' : 'var(--color-dim)',
+            fontSize: 14, lineHeight: 1,
+          }}
+        >
+          ⚙
+        </button>
       </div>
     </div>
   )
