@@ -166,7 +166,18 @@ export default function OutlineView(): JSX.Element {
                       style={{ outline: 'none', color: 'var(--color-dim)', minWidth: 40 }}>{node.pov}</span>
                   </td>
                   <td className={dimCell} style={dimStyle}>{wordCount ?? '—'}</td>
-                  <td className={dimCell} style={dimStyle}>{node.wordTarget ?? '—'}</td>
+                  <td className={dimCell} onClick={e => e.stopPropagation()}>
+                    <span
+                      contentEditable suppressContentEditableWarning
+                      style={{ outline: 'none', color: 'var(--color-dim)', minWidth: 30, display: 'inline-block', fontVariantNumeric: 'tabular-nums' }}
+                      onBlur={e => {
+                        const val = parseInt(e.currentTarget.textContent ?? '', 10)
+                        updateNode(node.id, { wordTarget: isNaN(val) || val <= 0 ? null : val })
+                      }}
+                    >
+                      {node.wordTarget ?? '—'}
+                    </span>
+                  </td>
                   <td className={dimCell}>
                     <div style={{ height: 4, background: 'var(--color-border)', borderRadius: 2, width: 60 }}>
                       <div style={{ height: '100%', width: `${progress * 100}%`, background: 'var(--color-accent)', borderRadius: 2 }} />
