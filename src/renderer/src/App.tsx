@@ -13,6 +13,7 @@ import SearchPanel from './components/Search/SearchPanel'
 import SnapshotsPanel from './components/Snapshots/SnapshotsPanel'
 import StoryBiblePanel from './components/StoryBible/StoryBiblePanel'
 import CompileDialog from './components/Compile/CompileDialog'
+import SettingsPanel from './components/Settings/SettingsPanel'
 import EditorToolbar from './components/Editor/EditorToolbar'
 import type { ProjectSummary } from '@shared/types'
 
@@ -101,6 +102,7 @@ export default function App(): JSX.Element {
         {rightPanel === 'search' && <SearchPanel />}
         {rightPanel === 'snapshots' && <SnapshotsPanel />}
         {rightPanel === 'bible' && <StoryBiblePanel />}
+        {rightPanel === 'settings' && <SettingsPanel />}
       </div>
       {compileDialogOpen && <CompileDialog onClose={() => setCompileDialogOpen(false)} />}
       <CrashRecoveryModal />

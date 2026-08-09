@@ -17,7 +17,7 @@ interface AppStore {
   isDirty: boolean
   saveStatus: 'saved' | 'saving' | 'unsaved' | 'error'
   binderOpen: boolean
-  rightPanel: 'none' | 'search' | 'snapshots' | 'bible'
+  rightPanel: 'none' | 'search' | 'snapshots' | 'bible' | 'settings'
   compileDialogOpen: boolean
   pendingCrashRecovery: PendingCrashRecovery | null
 
@@ -31,7 +31,7 @@ interface AppStore {
   setSaveStatus(s: 'saved' | 'saving' | 'unsaved' | 'error'): void
   updateProjectNodes(nodes: Record<string, ProjectNode>): void
   toggleBinder(): void
-  setRightPanel(p: 'none' | 'search' | 'snapshots' | 'bible'): void
+  setRightPanel(p: 'none' | 'search' | 'snapshots' | 'bible' | 'settings'): void
   setCompileDialogOpen(open: boolean): void
   setPendingCrashRecovery(d: PendingCrashRecovery | null): void
 }
