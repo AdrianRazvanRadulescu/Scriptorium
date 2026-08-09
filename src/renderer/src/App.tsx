@@ -11,6 +11,8 @@ import CrashRecoveryModal from './components/CrashRecoveryModal'
 import StatusBar from './components/StatusBar'
 import SearchPanel from './components/Search/SearchPanel'
 import SnapshotsPanel from './components/Snapshots/SnapshotsPanel'
+import StoryBiblePanel from './components/StoryBible/StoryBiblePanel'
+import CompileDialog from './components/Compile/CompileDialog'
 import EditorToolbar from './components/Editor/EditorToolbar'
 import type { ProjectSummary } from '@shared/types'
 
@@ -20,12 +22,14 @@ export default function App(): JSX.Element {
     libraryError,
     binderOpen,
     rightPanel,
+    compileDialogOpen,
     selectedNodeId,
     currentProject,
     folderView,
     setConfig,
     setProjects,
     setLibraryError,
+    setCompileDialogOpen,
     setPendingCrashRecovery,
   } = useAppStore()
 
@@ -96,7 +100,9 @@ export default function App(): JSX.Element {
         </main>
         {rightPanel === 'search' && <SearchPanel />}
         {rightPanel === 'snapshots' && <SnapshotsPanel />}
+        {rightPanel === 'bible' && <StoryBiblePanel />}
       </div>
+      {compileDialogOpen && <CompileDialog onClose={() => setCompileDialogOpen(false)} />}
       <CrashRecoveryModal />
     </ThemeProvider>
   )
@@ -218,7 +224,7 @@ function WelcomeScreen(): JSX.Element {
 
       {projects.length === 0 && !showInput && (
         <p className="text-sm text-center" style={{ color: 'var(--color-dim)', maxWidth: 280 }}>
-          Your writing lives in D:\Scriptorium. Create your first project to begin.
+          Create your first project to begin.
         </p>
       )}
     </div>
