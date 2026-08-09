@@ -35,7 +35,7 @@
   --font-ui: -apple-system, 'Segoe UI', system-ui, sans-serif;
   --font-size-prose: 18px;
   --line-height-prose: 1.7;
-  --measure-prose: 65ch;
+  --measure-prose: 100ch;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

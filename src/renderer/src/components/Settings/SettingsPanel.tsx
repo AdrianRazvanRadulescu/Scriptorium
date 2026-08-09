@@ -143,7 +143,7 @@ export default function SettingsPanel(): JSX.Element {
 
         <Row label={`Line width — ${config.measure}ch`}>
           <input
-            type='range' min={55} max={80} step={1}
+            type='range' min={50} max={140} step={5}
             value={config.measure}
             onChange={e => apply({ measure: Number(e.target.value) })}
             style={{ width: 100, accentColor: 'var(--color-accent)' }}
