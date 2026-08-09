@@ -4,9 +4,16 @@ dist-installer/
 .index/
 *.log
 
+# TypeScript build caches
+*.tsbuildinfo
+
 # Test artifacts
 test-results/
 playwright-report/
+
+# Ad-hoc dev scripts (superseded by drive-test.mjs)
+screenshot-app.mjs
+take-screenshot.js
 
 # Local env
 .env
