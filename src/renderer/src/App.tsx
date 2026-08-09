@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useAppStore from './store/app-store'
 import ThemeProvider from './themes/ThemeProvider'
 import BinderPanel from './components/Binder/BinderPanel'
@@ -12,8 +12,9 @@ import StatusBar from './components/StatusBar'
 import SearchPanel from './components/Search/SearchPanel'
 import SnapshotsPanel from './components/Snapshots/SnapshotsPanel'
 import EditorToolbar from './components/Editor/EditorToolbar'
+import type { ProjectSummary } from '@shared/types'
 
-function App(): JSX.Element {
+export default function App(): JSX.Element {
   const {
     config,
     libraryError,
@@ -35,21 +36,25 @@ function App(): JSX.Element {
     const onDriveStatus = (data: { available: boolean; libraryRoot: string }) => {
       if (!data.available) setLibraryError('Library root unavailable: ' + data.libraryRoot)
     }
-
     const onCrashRecovery = (data: {
       nodeId: string
       journalContent: string
       diskContent: string
-    }) => {
-      setPendingCrashRecovery(data)
-    }
+    }) => setPendingCrashRecovery(data)
+
+    // Bridge the IPC push event to a DOM CustomEvent so EditorPane can listen via
+    // window.addEventListener — this keeps EditorPane's cleanup logic straightforward.
+    const onQuitting = () =>
+      window.dispatchEvent(new CustomEvent('app:quitting'))
 
     window.api.on('drive:status', onDriveStatus as (...args: unknown[]) => void)
     window.api.on('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)
+    window.api.on('app:quitting', onQuitting)
 
     return () => {
       window.api.off('drive:status', onDriveStatus as (...args: unknown[]) => void)
       window.api.off('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)
+      window.api.off('app:quitting', onQuitting)
     }
   }, [setConfig, setProjects, setLibraryError, setPendingCrashRecovery])
 
@@ -66,12 +71,11 @@ function App(): JSX.Element {
     )
   }
 
-  const selectedNode = selectedNodeId && currentProject
-    ? currentProject.nodes[selectedNodeId]
-    : null
-
+  const selectedNode =
+    selectedNodeId && currentProject ? currentProject.nodes[selectedNodeId] : null
   const showEditor = selectedNode?.type === 'scene'
-  const showFolder = selectedNode?.type === 'folder' || (!selectedNode && currentProject !== null)
+  const showFolder =
+    selectedNode?.type === 'folder' || (!selectedNode && currentProject !== null)
 
   return (
     <ThemeProvider>
@@ -100,41 +104,60 @@ function App(): JSX.Element {
 
 function WelcomeScreen(): JSX.Element {
   const { projects, setCurrentProject, setSelectedNodeId } = useAppStore()
+  const [newTitle, setNewTitle] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [showInput, setShowInput] = useState(false)
+  const [error, setError] = useState('')
 
-  const openProject = async (dir: string) => {
-    const project = await window.api.openProject(dir)
+  const openProject = async (summary: ProjectSummary) => {
+    const project = await window.api.openProject(summary.dir)
     setCurrentProject(project)
     setSelectedNodeId(project.meta.rootNodeId)
   }
 
   const createProject = async () => {
-    const title = prompt('Project title:')
+    const title = newTitle.trim()
     if (!title) return
-    const project = await window.api.createProject(title)
-    setCurrentProject(project)
-    setSelectedNodeId(project.meta.rootNodeId)
+    setCreating(true)
+    setError('')
+    try {
+      const project = await window.api.createProject(title)
+      setCurrentProject(project)
+      setSelectedNodeId(project.meta.rootNodeId)
+      setNewTitle('')
+      setShowInput(false)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setCreating(false)
+    }
   }
 
   return (
     <div
-      className="flex flex-col items-center justify-center h-full gap-8"
+      className="flex flex-col items-center justify-center h-full gap-6"
       style={{ color: 'var(--color-dim)' }}
     >
       <h1
-        style={{ fontFamily: 'var(--font-prose)', fontSize: '2rem', color: 'var(--color-prose)' }}
+        style={{
+          fontFamily: 'var(--font-prose)',
+          fontSize: '2rem',
+          fontWeight: 400,
+          color: 'var(--color-prose)',
+          letterSpacing: '-0.02em',
+        }}
       >
         Scriptorium
       </h1>
-      {projects.length === 0 ? (
-        <p>No projects yet. Create one to begin.</p>
-      ) : (
-        <ul className="space-y-2">
+
+      {projects.length > 0 && (
+        <ul className="space-y-1 text-center">
           {projects.map(p => (
             <li key={p.id}>
               <button
-                onClick={() => openProject(p.dir)}
-                className="text-left hover:underline"
-                style={{ color: 'var(--color-prose)' }}
+                onClick={() => openProject(p)}
+                className="text-sm hover:underline"
+                style={{ color: 'var(--color-prose)', fontFamily: 'var(--font-prose)' }}
               >
                 {p.title}
               </button>
@@ -142,15 +165,62 @@ function WelcomeScreen(): JSX.Element {
           ))}
         </ul>
       )}
-      <button
-        onClick={createProject}
-        className="px-4 py-2 rounded"
-        style={{ background: 'var(--color-accent)', color: 'var(--color-page)' }}
-      >
-        New Project
-      </button>
+
+      {!showInput && (
+        <button
+          onClick={() => setShowInput(true)}
+          className="px-5 py-2 rounded text-sm"
+          style={{ background: 'var(--color-accent)', color: 'var(--color-page)' }}
+        >
+          New project
+        </button>
+      )}
+
+      {showInput && (
+        <div className="flex flex-col items-center gap-2">
+          <input
+            autoFocus
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') createProject()
+              if (e.key === 'Escape') { setShowInput(false); setNewTitle('') }
+            }}
+            placeholder="Project title"
+            className="px-3 py-1.5 rounded text-sm outline-none"
+            style={{
+              background: 'var(--color-chrome)',
+              color: 'var(--color-prose)',
+              border: '1px solid var(--color-border)',
+              minWidth: 220,
+            }}
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={createProject}
+              disabled={creating || !newTitle.trim()}
+              className="px-4 py-1.5 rounded text-sm"
+              style={{ background: 'var(--color-accent)', color: 'var(--color-page)' }}
+            >
+              {creating ? 'Creating…' : 'Create'}
+            </button>
+            <button
+              onClick={() => { setShowInput(false); setNewTitle(''); setError('') }}
+              className="px-4 py-1.5 rounded text-sm"
+              style={{ background: 'var(--color-chrome)', color: 'var(--color-dim)', border: '1px solid var(--color-border)' }}
+            >
+              Cancel
+            </button>
+          </div>
+          {error && <p className="text-xs" style={{ color: '#C0504D' }}>{error}</p>}
+        </div>
+      )}
+
+      {projects.length === 0 && !showInput && (
+        <p className="text-sm text-center" style={{ color: 'var(--color-dim)', maxWidth: 280 }}>
+          Your writing lives in D:\Scriptorium. Create your first project to begin.
+        </p>
+      )}
     </div>
   )
 }
-
-export default App

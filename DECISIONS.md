@@ -28,6 +28,14 @@
 
 14. **No React Router** — state-driven view switching is simpler for a local desktop app with no URL semantics. The app has a small number of views (library, project, editor, settings) that map naturally to Zustand state. Routes add complexity without benefit in a single-window desktop context.
 
-15. **D: library + C: backup split** — intentional single-point-of-failure prevention. If the D: drive fails, backups on C: are untouched, and vice versa. Defaulting to different volumes makes the safety property automatic for most users without requiring manual configuration.
+15. **titleBarStyle:'hidden' + frame:false on Windows** — produces a fully custom window chrome with no native title bar. The app draws its own drag region via `-webkit-app-region: drag` CSS. This is required for the minimal, distraction-free aesthetic. Known consequence: the window is not resizable via the native border — resize handles must be implemented in CSS/JS or accepted as a trade-off.
 
-16. **Performance: cold-start < 2s target** — depends on Electron bootstrap which is outside app code control. The measurable parts (JSON parse, scene load, search query) are covered by scale tests. The target is documented as a guideline, not a hard guarantee.
+16. **D: library + C: backup split** — intentional single-point-of-failure prevention. If the D: drive fails, backups on C: are untouched, and vice versa. Defaulting to different volumes makes the safety property automatic for most users without requiring manual configuration.
+
+17. **Performance: cold-start < 2s target** — depends on Electron bootstrap which is outside app code control. The measurable parts (JSON parse, scene load, search query) are covered by scale tests. The target is documented as a guideline, not a hard guarantee.
+
+18. **EditorPane scene-load deps are stable primitives, not the full currentProject object** — `currentProject` changes identity on every `updateProjectNodes` call (node rename, status change, etc.), which would re-trigger the scene-load effect on every node edit, causing a render cascade (React error #185). The fix: the effect depends on `[selectedNodeId, projectDir]` where `projectDir` is a string that only changes when the project itself changes. Node objects inside the project are read via `getState()` at run time.
+
+19. **isLoadingRef guards handleUpdate during scene dispatch** — when `view.dispatch()` loads content into CodeMirror on scene selection, the `updateListener` fires `handleUpdate`, which would incorrectly mark the file as dirty and schedule an autosave for content just read from disk. The `isLoadingRef` boolean is set to `true` around the dispatch call so `handleUpdate` skips the dirty/save path during programmatic loads.
+
+20. **Zustand selectors return primitives, not object literals** — a selector like `useStore(s => ({ a: s.a, b: s.b }))` returns a new object on every call, causing the component to re-render on every store change (Zustand's default equality is `Object.is`). Every selector that feeds a subscription should return a primitive or a direct reference to a store value, not a freshly-constructed object. Components that need multiple slices use separate `useStore(s => s.x)` calls.

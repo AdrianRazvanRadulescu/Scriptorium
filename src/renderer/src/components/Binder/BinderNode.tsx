@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { v4 as uuid } from 'uuid'
 import useAppStore from '../../store/app-store'
 import useEditorStore from '../../store/editor-store'
@@ -72,6 +72,10 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
   if (!node || !currentProject) return null
   const { nodes, meta, projectDir } = currentProject
   const isSelected = selectedNodeId === nodeId
+
+  // Stable reference so ContextMenu's useEffect([p.onClose]) doesn't rerun on every
+  // parent re-render, which would constantly remove and re-add the mousedown listener.
+  const closeMenu = useCallback(() => setMenu(null), [])
 
   const saveNodes = async (updated: Record<string, ProjectNode>) => {
     updateProjectNodes(updated)
@@ -183,7 +187,7 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
         <BinderNode key={id} nodeId={id} depth={depth + 1} />
       )}
       {menu && (
-        <ContextMenu x={menu.x} y={menu.y} type={node.type} onClose={() => setMenu(null)}
+        <ContextMenu x={menu.x} y={menu.y} type={node.type} onClose={closeMenu}
           onSnapshot={async () => {
             if (!node.sceneFile) return
             await window.api.createSnapshot(projectDir, nodeId, await window.api.readScene(projectDir, node.sceneFile))
