@@ -1,0 +1,59 @@
+/* Prose fonts - bundled via @fontsource npm packages */
+@import '@fontsource/literata/400.css';
+@import '@fontsource/literata/400-italic.css';
+@import '@fontsource/literata/700.css';
+@import '@fontsource/eb-garamond/400.css';
+@import '@fontsource/eb-garamond/400-italic.css';
+@import '@fontsource/eb-garamond/700.css';
+@import '@fontsource/crimson-pro/400.css';
+@import '@fontsource/crimson-pro/400-italic.css';
+@import '@fontsource/crimson-pro/700.css';
+@import '@fontsource/spectral/400.css';
+@import '@fontsource/spectral/400-italic.css';
+@import '@fontsource/spectral/700.css';
+@import '@fontsource/newsreader/400.css';
+@import '@fontsource/newsreader/400-italic.css';
+@import '@fontsource/newsreader/700.css';
+@import '@fontsource/vollkorn/400.css';
+@import '@fontsource/vollkorn/400-italic.css';
+@import '@fontsource/vollkorn/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-page: #12110F;
+  --color-prose: #E8E3D9;
+  --color-dim: #4A4640;
+  --color-chrome: #1C1A17;
+  --color-border: #2A2723;
+  --color-accent: #C0956F;
+  --color-selection: #2A2420;
+  --font-prose: Literata, Georgia, serif;
+  --font-ui: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-size-prose: 18px;
+  --line-height-prose: 1.7;
+  --measure-prose: 65ch;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; overflow: hidden; margin: 0; padding: 0; }
+body { font-family: var(--font-ui); background: var(--color-page); color: var(--color-prose); }
+
+::selection { background: var(--color-selection); }
+
+/* Thin scrollbars */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-dim); }
+
+/* Screen reader only */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Smooth theme transitions for background/color changes */
+* { transition: background-color 80ms ease, color 80ms ease; }
+/* But NOT for transforms (drag, animations) */
+.no-transition, .no-transition * { transition: none !important; }
