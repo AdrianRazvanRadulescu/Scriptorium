@@ -16,7 +16,15 @@ export interface EditorOptions {
 export function buildEditorTheme(): Extension {
   return EditorView.theme(
     {
-      '&': { background: 'transparent', height: '100%' },
+      // Setting font vars directly here overrides CodeMirror's base theme (which defaults to
+      // monospace) without relying on CSS specificity tricks from external stylesheets.
+      '&': {
+        background: 'transparent',
+        height: '100%',
+        fontFamily: 'var(--font-prose)',
+        fontSize: 'var(--font-size-prose)',
+        lineHeight: 'var(--line-height-prose)',
+      },
       '.cm-content': { caretColor: 'var(--color-accent)', padding: '0' },
       '.cm-cursor': { borderLeftColor: 'var(--color-accent)', borderLeftWidth: '2px' },
       '.cm-selectionBackground': { background: 'var(--color-selection) !important' },

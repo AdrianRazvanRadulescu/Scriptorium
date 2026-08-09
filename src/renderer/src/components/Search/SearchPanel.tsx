@@ -114,8 +114,12 @@ export default function SearchPanel(): JSX.Element {
           <select
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className='flex-1 text-xs font-ui px-1.5 py-1 rounded border bg-transparent'
-            style={{ borderColor: 'var(--color-border)', color: 'var(--color-dim)' }}
+            className='flex-1 text-xs font-ui px-1.5 py-1 rounded border'
+            style={{
+              background: 'var(--color-page)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-dim)',
+            }}
           >
             <option value=''>All projects</option>
             {projects.map((p) => (
@@ -125,8 +129,12 @@ export default function SearchPanel(): JSX.Element {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as NodeStatus | '')}
-            className='flex-1 text-xs font-ui px-1.5 py-1 rounded border bg-transparent'
-            style={{ borderColor: 'var(--color-border)', color: 'var(--color-dim)' }}
+            className='flex-1 text-xs font-ui px-1.5 py-1 rounded border'
+            style={{
+              background: 'var(--color-page)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-dim)',
+            }}
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>

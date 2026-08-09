@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid'
 import type { ProjectNode } from '@shared/types'
 
 const COLOR_STRIPES: Record<ProjectNode['color'], string> = {
-  none: 'var(--color-border)', red: '#C0504D', orange: '#E36C09',
+  none: 'transparent', red: '#C0504D', orange: '#E36C09',
   yellow: '#C0A000', green: '#4E9A06', blue: '#3465A4', purple: '#75507B',
 }
 

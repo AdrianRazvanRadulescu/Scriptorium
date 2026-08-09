@@ -78,6 +78,58 @@ const terminal: ThemeDefinition = {
   isLight: false,
 }
 
+const sepia: ThemeDefinition = {
+  id: 'sepia',
+  name: 'Sepia',
+  page: '#F4EBD0',
+  prose: '#3C2F1A',
+  dim: '#9A8672',
+  chrome: '#EDE3C5',
+  border: '#D6C9A8',
+  accent: '#8B5A2B',
+  selection: '#D6C9A8',
+  isLight: true,
+}
+
+const midnight: ThemeDefinition = {
+  id: 'midnight',
+  name: 'Midnight',
+  page: '#07090F',
+  prose: '#B4C4D8',
+  dim: '#2C3A4A',
+  chrome: '#0C1018',
+  border: '#151F2D',
+  accent: '#4C82B0',
+  selection: '#0F1F33',
+  isLight: false,
+}
+
+const dusk: ThemeDefinition = {
+  id: 'dusk',
+  name: 'Dusk',
+  page: '#12101C',
+  prose: '#C4B8D8',
+  dim: '#3A3050',
+  chrome: '#1A1728',
+  border: '#252038',
+  accent: '#9B77CC',
+  selection: '#201B33',
+  isLight: false,
+}
+
+const manuscript: ThemeDefinition = {
+  id: 'manuscript',
+  name: 'Manuscript',
+  page: '#FFFFFF',
+  prose: '#111111',
+  dim: '#888888',
+  chrome: '#F4F4F4',
+  border: '#E0E0E0',
+  accent: '#333333',
+  selection: '#E8E8E8',
+  isLight: true,
+}
+
 export const THEMES: Record<string, ThemeDefinition> = {
   nocturne,
   ember,
@@ -85,6 +137,13 @@ export const THEMES: Record<string, ThemeDefinition> = {
   vellum,
   foolscap,
   terminal,
+  sepia,
+  midnight,
+  dusk,
+  manuscript,
 }
 
-export const THEME_ORDER = ['nocturne', 'ember', 'tidewater', 'vellum', 'foolscap', 'terminal']
+export const THEME_ORDER = [
+  'nocturne', 'ember', 'tidewater', 'midnight', 'dusk',
+  'vellum', 'sepia', 'foolscap', 'manuscript', 'terminal',
+]
