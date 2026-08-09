@@ -18,6 +18,7 @@ interface AppStore {
   saveStatus: 'saved' | 'saving' | 'unsaved' | 'error'
   binderOpen: boolean
   rightPanel: 'none' | 'search' | 'snapshots' | 'bible'
+  compileDialogOpen: boolean
   pendingCrashRecovery: PendingCrashRecovery | null
 
   setConfig(config: AppConfig): void
@@ -31,6 +32,7 @@ interface AppStore {
   updateProjectNodes(nodes: Record<string, ProjectNode>): void
   toggleBinder(): void
   setRightPanel(p: 'none' | 'search' | 'snapshots' | 'bible'): void
+  setCompileDialogOpen(open: boolean): void
   setPendingCrashRecovery(d: PendingCrashRecovery | null): void
 }
 
@@ -45,6 +47,7 @@ const useAppStore = create<AppStore>((set) => ({
   saveStatus: 'saved',
   binderOpen: true,
   rightPanel: 'none',
+  compileDialogOpen: false,
   pendingCrashRecovery: null,
 
   setConfig: (config) => set((state) => ({ ...state, config })),
@@ -76,6 +79,8 @@ const useAppStore = create<AppStore>((set) => ({
   toggleBinder: () => set((state) => ({ ...state, binderOpen: !state.binderOpen })),
 
   setRightPanel: (rightPanel) => set((state) => ({ ...state, rightPanel })),
+
+  setCompileDialogOpen: (compileDialogOpen) => set((state) => ({ ...state, compileDialogOpen })),
 
   setPendingCrashRecovery: (pendingCrashRecovery) =>
     set((state) => ({ ...state, pendingCrashRecovery })),

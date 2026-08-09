@@ -34,6 +34,7 @@ export default function EditorToolbar(): JSX.Element {
   const {
     selectedNodeId, currentProject, folderView, rightPanel,
     setFolderView, setRightPanel, toggleBinder, binderOpen,
+    setCompileDialogOpen,
   } = useAppStore()
 
   const selectedNode = selectedNodeId && currentProject
@@ -106,6 +107,20 @@ export default function EditorToolbar(): JSX.Element {
           onClick={() => setRightPanel(rightPanel === 'snapshots' ? 'none' : 'snapshots')}
           title='Snapshots'
         />
+        <Btn
+          label='Bible'
+          active={rightPanel === 'bible'}
+          onClick={() => setRightPanel(rightPanel === 'bible' ? 'none' : 'bible')}
+          title='Story Bible'
+        />
+        {currentProject !== null && (
+          <Btn
+            label='Compile'
+            active={false}
+            onClick={() => setCompileDialogOpen(true)}
+            title='Export / Compile'
+          />
+        )}
         <Btn label='Fullscreen' active={false} onClick={toggleFullscreen} title='Fullscreen (F11)' />
         <Btn label='Binder' active={binderOpen} onClick={toggleBinder} title='Toggle Binder' />
       </div>
