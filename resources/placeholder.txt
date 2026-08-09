@@ -1,0 +1,2 @@
+Replace this file with a real icon.ico before building the distribution installer.
+A 256x256 .ico file works best for Windows taskbar and installer.

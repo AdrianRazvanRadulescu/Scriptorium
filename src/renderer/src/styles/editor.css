@@ -1,0 +1,34 @@
+/* CodeMirror 6 editor overrides */
+.cm-editor {
+  background: transparent !important;
+  font-family: var(--font-prose) !important;
+  font-size: var(--font-size-prose) !important;
+  line-height: var(--line-height-prose) !important;
+  height: 100%;
+}
+.cm-scroller { overflow: auto !important; }
+.cm-content { padding: 0 !important; caret-color: var(--color-accent); }
+.cm-line { padding: 0 !important; color: var(--color-prose); }
+.cm-cursor { border-left-color: var(--color-accent) !important; border-left-width: 2px !important; }
+.cm-selectionBackground { background: var(--color-selection) !important; }
+.cm-focused .cm-selectionBackground { background: var(--color-selection) !important; }
+
+/* Inline Markdown decorations */
+.cm-bold { font-weight: 700; }
+.cm-italic { font-style: italic; }
+.cm-strike { text-decoration: line-through; opacity: 0.7; }
+.cm-heading1 { font-size: 1.4em; font-weight: 700; }
+.cm-heading2 { font-size: 1.2em; font-weight: 700; }
+.cm-heading3 { font-weight: 700; }
+.cm-mark-hidden { opacity: 0; font-size: 0; } /* hidden syntax marks */
+.cm-link { color: var(--color-accent); text-decoration: underline; }
+.cm-code-inline { font-family: var(--font-ui); background: var(--color-chrome); padding: 0 3px; border-radius: 2px; }
+
+/* Focus mode */
+.focus-mode .cm-line { opacity: 0.3; transition: opacity 150ms ease; }
+.focus-mode .cm-line.cm-activeLine { opacity: 1; }
+
+/* CodeMirror scrollbar */
+.cm-scroller::-webkit-scrollbar { width: 5px; }
+.cm-scroller::-webkit-scrollbar-track { background: transparent; }
+.cm-scroller::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
