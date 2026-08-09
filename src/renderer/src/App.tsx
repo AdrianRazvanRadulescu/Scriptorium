@@ -47,9 +47,14 @@ export default function App(): JSX.Element {
       if (cfg.lastOpenProjectId !== null) {
         const summary = projects.find(p => p.id === cfg.lastOpenProjectId)
         if (summary !== undefined) {
-          const project = await window.api.openProject(summary.dir)
-          setCurrentProject(project)
-          setSelectedNodeId(project.meta.rootNodeId)
+          try {
+            const project = await window.api.openProject(summary.dir)
+            setCurrentProject(project)
+            setSelectedNodeId(project.meta.rootNodeId)
+          } catch {
+            // Project directory moved or deleted — clear the stale reference
+            window.api.setConfig({ lastOpenProjectId: null }).catch(() => {})
+          }
         }
       }
     }

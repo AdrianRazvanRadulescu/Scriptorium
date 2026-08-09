@@ -16,8 +16,12 @@ async function shot(page, label) {
   shots++
   const name = `${String(shots).padStart(2, '0')}-${label}.png`
   const p = path.join(SHOT_DIR, name)
-  await page.screenshot({ path: p, fullPage: false })
-  console.log(`📸 ${name}`)
+  try {
+    await page.screenshot({ path: p, fullPage: false, timeout: 8000 })
+    console.log(`📸 ${name}`)
+  } catch {
+    console.log(`📸 ${name} (skipped — screenshot timeout)`)
+  }
   return p
 }
 
@@ -48,12 +52,16 @@ const app = await electron.launch({
   timeout: 25_000,
 })
 
-await wait(4000)
+await wait(5000)
 
 const allWindows = app.windows()
 console.log(`   ${allWindows.length} window(s)`)
 const page = allWindows.find(w => !w.url().includes('devtools')) ?? await app.firstWindow()
 console.log(`   URL: ${page.url()}`)
+
+// Wait for any async initialization (auto-reopen last project) to settle
+await page.waitForLoadState('domcontentloaded')
+await wait(1500)
 
 // Collect console messages for error detection
 const consoleMessages = []
