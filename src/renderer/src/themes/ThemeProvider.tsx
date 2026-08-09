@@ -9,7 +9,6 @@ const FONT_FAMILIES: Record<string, string> = {
   'spectral': 'Spectral, Georgia, serif',
   'newsreader': 'Newsreader, Georgia, serif',
   'vollkorn': 'Vollkorn, Georgia, serif',
-  'ia-writer-quattro': '"iA Writer Quattro", "JetBrains Mono", monospace',
   'jetbrains-mono': '"JetBrains Mono", monospace',
 }
 

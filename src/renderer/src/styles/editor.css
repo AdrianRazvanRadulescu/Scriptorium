@@ -17,10 +17,11 @@
 .cm-bold { font-weight: 700; }
 .cm-italic { font-style: italic; }
 .cm-strike { text-decoration: line-through; opacity: 0.7; }
-.cm-heading1 { font-size: 1.4em; font-weight: 700; }
-.cm-heading2 { font-size: 1.2em; font-weight: 700; }
-.cm-heading3 { font-weight: 700; }
-.cm-mark-hidden { opacity: 0; font-size: 0; } /* hidden syntax marks */
+/* Headings: bigger and bolder, same prose color — !important overrides any internal CM highlight */
+.cm-heading1 { font-size: 1.4em; font-weight: 700; color: var(--color-prose) !important; letter-spacing: -0.01em; }
+.cm-heading2 { font-size: 1.2em; font-weight: 700; color: var(--color-prose) !important; }
+.cm-heading3 { font-weight: 700; color: var(--color-prose) !important; }
+.cm-mark-hidden { opacity: 0; font-size: 0; }
 .cm-link { color: var(--color-accent); text-decoration: underline; }
 .cm-code-inline { font-family: var(--font-ui); background: var(--color-chrome); padding: 0 3px; border-radius: 2px; }
 

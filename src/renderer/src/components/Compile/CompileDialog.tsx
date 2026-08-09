@@ -114,7 +114,7 @@ export default function CompileDialog({ onClose }: Props): JSX.Element {
             <select
               value={headingStyle}
               onChange={e => setHeadingStyle(e.target.value as CompileOptions['headingStyle'])}
-              className='ml-2 text-xs px-2 py-0.5 rounded'
+              className='ml-2 text-xs px-2 py-0.5 rounded outline-none'
               style={{ background: 'var(--color-page)', color: 'var(--color-prose)', border: '1px solid var(--color-border)' }}
             >
               <option value='none'>None</option>

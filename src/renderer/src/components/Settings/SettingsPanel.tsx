@@ -10,7 +10,6 @@ const FONTS: Array<{ id: string; label: string }> = [
   { id: 'spectral', label: 'Spectral' },
   { id: 'newsreader', label: 'Newsreader' },
   { id: 'vollkorn', label: 'Vollkorn' },
-  { id: 'ia-writer-quattro', label: 'iA Writer Quattro' },
   { id: 'jetbrains-mono', label: 'JetBrains Mono' },
 ]
 
