@@ -30,13 +30,30 @@ export default function App(): JSX.Element {
     setConfig,
     setProjects,
     setLibraryError,
+    setCurrentProject,
+    setSelectedNodeId,
     setCompileDialogOpen,
     setPendingCrashRecovery,
   } = useAppStore()
 
   useEffect(() => {
-    window.api.getConfig().then(setConfig)
-    window.api.listProjects().then(setProjects)
+    // Load config first, then projects. If a lastOpenProjectId is stored,
+    // auto-reopen that project so the user lands in their work immediately.
+    const init = async () => {
+      const cfg = await window.api.getConfig()
+      setConfig(cfg)
+      const projects = await window.api.listProjects()
+      setProjects(projects)
+      if (cfg.lastOpenProjectId !== null) {
+        const summary = projects.find(p => p.id === cfg.lastOpenProjectId)
+        if (summary !== undefined) {
+          const project = await window.api.openProject(summary.dir)
+          setCurrentProject(project)
+          setSelectedNodeId(project.meta.rootNodeId)
+        }
+      }
+    }
+    void init()
 
     const onDriveStatus = (data: { available: boolean; libraryRoot: string }) => {
       if (!data.available) setLibraryError('Library root unavailable: ' + data.libraryRoot)
@@ -61,7 +78,7 @@ export default function App(): JSX.Element {
       window.api.off('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)
       window.api.off('app:quitting', onQuitting)
     }
-  }, [setConfig, setProjects, setLibraryError, setPendingCrashRecovery])
+  }, [setConfig, setProjects, setLibraryError, setCurrentProject, setSelectedNodeId, setPendingCrashRecovery])
 
   if (libraryError) {
     const retryLibrary = () =>
@@ -121,6 +138,7 @@ function WelcomeScreen(): JSX.Element {
     const project = await window.api.openProject(summary.dir)
     setCurrentProject(project)
     setSelectedNodeId(project.meta.rootNodeId)
+    window.api.setConfig({ lastOpenProjectId: project.meta.id }).catch(() => {})
   }
 
   const createProject = async () => {
@@ -134,6 +152,7 @@ function WelcomeScreen(): JSX.Element {
       setSelectedNodeId(project.meta.rootNodeId)
       setNewTitle('')
       setShowInput(false)
+      window.api.setConfig({ lastOpenProjectId: project.meta.id }).catch(() => {})
     } catch (e) {
       setError(String(e))
     } finally {
