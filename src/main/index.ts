@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import { is } from '@electron-toolkit/utils'
@@ -50,6 +50,42 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => mainWindow!.show())
 
+  // Intercept close to flush pending scene saves before destroying the window.
+  //
+  // WHY: ipcMain.handle() calls event.reply() internally after the handler
+  // resolves. If win.destroy() races with an in-flight ipcRenderer.invoke()
+  // from the renderer, event.reply() throws "Object has been destroyed" in
+  // the main process — shown to the user as the JS error dialog.
+  //
+  // FIX: we prevent the default close, tell the renderer to save via
+  // app:quitting, and wait for the renderer to call notifySaveDone() (which
+  // fires AFTER the ipcRenderer.invoke calls complete). Only then we destroy
+  // the window — at which point there are no in-flight IPC calls left.
+  // A 3-second fallback handles the case where no scene is open (EditorPane
+  // is not mounted and never calls notifySaveDone).
+  mainWindow.on('close', (event) => {
+    event.preventDefault()
+    const win = mainWindow
+    if (!win || win.isDestroyed()) return
+
+    const destroy = () => {
+      if (win && !win.isDestroyed()) win.destroy()
+    }
+
+    const fallback = setTimeout(destroy, 3000)
+
+    ipcMain.once('renderer:save-done', () => {
+      clearTimeout(fallback)
+      destroy()
+    })
+
+    win.webContents.send('app:quitting')
+  })
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -95,7 +131,3 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('before-quit', () => {
-  // Signal renderer to flush any pending scene saves before the process exits.
-  mainWindow?.webContents.send('app:quitting')
-})

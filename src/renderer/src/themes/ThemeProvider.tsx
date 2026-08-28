@@ -36,7 +36,8 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     root.style.setProperty('--font-prose', FONT_FAMILIES[config.font] ?? FONT_FAMILIES['literata'])
     root.style.setProperty('--font-size-prose', config.fontSize + 'px')
     root.style.setProperty('--line-height-prose', String(config.lineHeight))
-    root.style.setProperty('--measure-prose', config.measure + 'ch')
+    // 300 is the sentinel for "no limit" — max-width: none removes the column constraint
+    root.style.setProperty('--measure-prose', config.measure >= 300 ? 'none' : config.measure + 'ch')
 
     if (theme.isLight) {
       root.classList.add('theme-light')
