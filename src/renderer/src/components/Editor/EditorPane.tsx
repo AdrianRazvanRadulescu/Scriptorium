@@ -145,9 +145,13 @@ export default function EditorPane(): JSX.Element | null {
     containerRef.current.classList.toggle('focus-mode', config.focusMode)
   }, [config?.focusMode, config])
 
-  // Best-effort save before the Electron main process quits.
+  // Save before quit, then signal the main process that it is safe to close.
+  // The main process waits for this signal before destroying the window,
+  // which prevents ipcMain.handle() from replying to a destroyed webContents.
   useEffect(() => {
-    const handleQuitting = () => { void triggerSave() }
+    const handleQuitting = () => {
+      triggerSave().finally(() => window.api.notifySaveDone())
+    }
     window.addEventListener('app:quitting', handleQuitting)
     return () => window.removeEventListener('app:quitting', handleQuitting)
   }, [triggerSave])

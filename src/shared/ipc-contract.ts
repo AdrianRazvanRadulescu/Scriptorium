@@ -71,6 +71,11 @@ export interface ScriptoriumAPI {
   // ── Event bus (renderer subscribes to main-pushed events) ───────────────────
   on(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void
   off(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void
+
+  // ── Quit handshake ─────────────────────────────────────────────────────────
+  // Called by EditorPane after triggerSave() completes during app:quitting.
+  // Tells the main process it is safe to destroy the window.
+  notifySaveDone(): void
 }
 
 // Channels on which main pushes events to renderer

@@ -69,10 +69,20 @@ export default function App(): JSX.Element {
       diskContent: string
     }) => setPendingCrashRecovery(data)
 
-    // Bridge the IPC push event to a DOM CustomEvent so EditorPane can listen via
-    // window.addEventListener — this keeps EditorPane's cleanup logic straightforward.
-    const onQuitting = () =>
+    // Bridge the IPC push event to a DOM CustomEvent so EditorPane can listen.
+    // EditorPane calls notifySaveDone() after triggerSave() completes.
+    // If no scene is open, EditorPane is not mounted — signal done immediately
+    // so the app doesn't wait 3 seconds for the fallback timeout.
+    const onQuitting = () => {
       window.dispatchEvent(new CustomEvent('app:quitting'))
+      const { selectedNodeId, currentProject } = useAppStore.getState()
+      const selectedNode = selectedNodeId && currentProject
+        ? currentProject.nodes[selectedNodeId]
+        : null
+      if (!selectedNode || selectedNode.type !== 'scene') {
+        window.api.notifySaveDone()
+      }
+    }
 
     window.api.on('drive:status', onDriveStatus as (...args: unknown[]) => void)
     window.api.on('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)

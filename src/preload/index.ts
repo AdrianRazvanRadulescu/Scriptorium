@@ -58,6 +58,10 @@ const api: ScriptoriumAPI = {
     const wrapper = wrappers.get(fn)
     if (wrapper) ipcRenderer.removeListener(channel, wrapper)
   },
+
+  // One-way signal — no reply expected, so ipcRenderer.send not .invoke.
+  // This avoids ipcMain.handle trying to reply to a destroyed webContents.
+  notifySaveDone: (): void => ipcRenderer.send('renderer:save-done'),
 }
 
 contextBridge.exposeInMainWorld('api', api)
