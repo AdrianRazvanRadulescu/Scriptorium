@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+import { useEffect, useState } from 'react'
 import useAppStore from '../store/app-store'
 import useEditorStore from '../store/editor-store'
 
@@ -16,6 +17,14 @@ export default function StatusBar(): JSX.Element {
   const rightPanel = useAppStore(s => s.rightPanel)
   const setRightPanel = useAppStore(s => s.setRightPanel)
   const { sceneWordCount, sessionWordsAtOpen, projectWordCount } = useEditorStore()
+  const [todayWords, setTodayWords] = useState(0)
+
+  // Refresh the daily counter on mount and after every completed save.
+  useEffect(() => {
+    if (saveStatus === 'saved') {
+      window.api.getTodayWords().then(setTodayWords).catch(() => {})
+    }
+  }, [saveStatus])
 
   const selectedNode = selectedNodeId && currentProject
     ? currentProject.nodes[selectedNodeId] : null
@@ -43,6 +52,7 @@ export default function StatusBar(): JSX.Element {
       <div className='flex items-center gap-4'>
         <span>{sceneWordCount.toLocaleString()} words</span>
         {sessionCount > 0 && <span>+{sessionCount.toLocaleString()} this session</span>}
+        {todayWords > 0 && <span>{todayWords.toLocaleString()} today</span>}
         {projectWordCount > 0 && <span>{projectWordCount.toLocaleString()} total</span>}
       </div>
 

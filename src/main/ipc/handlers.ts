@@ -16,6 +16,8 @@ import { moveToTrash, listTrash, restoreFromTrash } from '../fs/trash'
 import { searchIndex, upsertDocument, rebuildIndex } from '../db/search-index'
 import { writeCrashJournal, readCrashJournal, clearCrashJournal } from '../crash-journal'
 import { compileProject } from '../compiler'
+import { recordWordDelta, getTodayWords } from '../daily-stats'
+import { countWords } from '../fs/word-count'
 
 export function registerIpcHandlers(db: Database.Database | null): void {
   ipcMain.handle('config:get', async () => readConfig())
@@ -62,7 +64,19 @@ export function registerIpcHandlers(db: Database.Database | null): void {
   ipcMain.handle(
     'scene:write',
     async (_e, projectDir: string, sceneFile: string, content: string) => {
+      // Read the old version first so we can track how many words this save added.
+      let oldWordCount = 0
+      try {
+        oldWordCount = countWords(await readScene(projectDir, sceneFile))
+      } catch {
+        // new scene, no file yet
+      }
+
       await writeScene(projectDir, sceneFile, content)
+
+      // Stats failure is non-fatal — prose is already saved
+      recordWordDelta(countWords(content) - oldWordCount).catch(() => {})
+
       // Index update failure is non-fatal — prose is already saved
       try {
         const pf = await readProjectFile(projectDir)
@@ -147,4 +161,6 @@ export function registerIpcHandlers(db: Database.Database | null): void {
   ipcMain.handle('shell:show-item', async (_e, itemPath: string) =>
     shell.showItemInFolder(itemPath)
   )
+
+  ipcMain.handle('stats:today-words', async () => getTodayWords())
 }

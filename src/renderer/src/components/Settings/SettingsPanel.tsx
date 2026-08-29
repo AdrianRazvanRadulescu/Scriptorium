@@ -125,7 +125,7 @@ export default function SettingsPanel(): JSX.Element {
 
         <Row label={`Font size — ${config.fontSize}px`}>
           <input
-            type='range' min={15} max={24} step={1}
+            type='range' min={13} max={28} step={1}
             value={config.fontSize}
             onChange={e => apply({ fontSize: Number(e.target.value) })}
             style={{ width: 100, accentColor: 'var(--color-accent)' }}

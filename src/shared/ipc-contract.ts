@@ -68,6 +68,9 @@ export interface ScriptoriumAPI {
   // ── Shell helpers ────────────────────────────────────────────────────────────
   showItemInFolder(path: string): Promise<void>
 
+  // ── Writing stats ────────────────────────────────────────────────────────────
+  getTodayWords(): Promise<number>
+
   // ── Event bus (renderer subscribes to main-pushed events) ───────────────────
   on(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void
   off(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void

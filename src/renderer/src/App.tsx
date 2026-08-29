@@ -84,11 +84,30 @@ export default function App(): JSX.Element {
       }
     }
 
+    // Text zoom: Ctrl+= / Ctrl+- adjust font size, Ctrl+0 resets to default.
+    const onZoomKey = (e: KeyboardEvent) => {
+      if (!e.ctrlKey || e.altKey) return
+      const { config, setConfig } = useAppStore.getState()
+      if (config === null) return
+
+      let fontSize: number
+      if (e.key === '=' || e.key === '+') fontSize = Math.min(28, config.fontSize + 1)
+      else if (e.key === '-') fontSize = Math.max(13, config.fontSize - 1)
+      else if (e.key === '0') fontSize = 18
+      else return
+
+      e.preventDefault()
+      setConfig({ ...config, fontSize })
+      window.api.setConfig({ fontSize }).catch(() => {})
+    }
+
+    window.addEventListener('keydown', onZoomKey)
     window.api.on('drive:status', onDriveStatus as (...args: unknown[]) => void)
     window.api.on('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)
     window.api.on('app:quitting', onQuitting)
 
     return () => {
+      window.removeEventListener('keydown', onZoomKey)
       window.api.off('drive:status', onDriveStatus as (...args: unknown[]) => void)
       window.api.off('crash:recovery', onCrashRecovery as (...args: unknown[]) => void)
       window.api.off('app:quitting', onQuitting)
