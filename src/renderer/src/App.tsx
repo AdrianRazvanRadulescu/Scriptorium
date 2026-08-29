@@ -12,6 +12,8 @@ import StatusBar from './components/StatusBar'
 import SearchPanel from './components/Search/SearchPanel'
 import SnapshotsPanel from './components/Snapshots/SnapshotsPanel'
 import StoryBiblePanel from './components/StoryBible/StoryBiblePanel'
+import JourneyPanel from './components/Journey/JourneyPanel'
+import { useT } from './i18n/strings'
 import CompileDialog from './components/Compile/CompileDialog'
 import SettingsPanel from './components/Settings/SettingsPanel'
 import EditorToolbar from './components/Editor/EditorToolbar'
@@ -154,6 +156,7 @@ export default function App(): JSX.Element {
         {rightPanel === 'snapshots' && <SnapshotsPanel />}
         {rightPanel === 'bible' && <StoryBiblePanel />}
         {rightPanel === 'settings' && <SettingsPanel />}
+        {rightPanel === 'journey' && <JourneyPanel />}
       </div>
       {compileDialogOpen && <CompileDialog onClose={() => setCompileDialogOpen(false)} />}
       <CrashRecoveryModal />
@@ -163,6 +166,7 @@ export default function App(): JSX.Element {
 
 function WelcomeScreen(): JSX.Element {
   const { projects, setCurrentProject, setSelectedNodeId } = useAppStore()
+  const t = useT()
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
   const [showInput, setShowInput] = useState(false)
@@ -233,7 +237,7 @@ function WelcomeScreen(): JSX.Element {
           className="px-5 py-2 rounded text-sm"
           style={{ background: 'var(--color-accent)', color: 'var(--color-page)' }}
         >
-          New project
+          {t('newProject')}
         </button>
       )}
 
@@ -247,7 +251,7 @@ function WelcomeScreen(): JSX.Element {
               if (e.key === 'Enter') createProject()
               if (e.key === 'Escape') { setShowInput(false); setNewTitle('') }
             }}
-            placeholder="Project title"
+            placeholder={t('projectTitle')}
             className="px-3 py-1.5 rounded text-sm outline-none"
             style={{
               background: 'var(--color-chrome)',
@@ -263,14 +267,14 @@ function WelcomeScreen(): JSX.Element {
               className="px-4 py-1.5 rounded text-sm"
               style={{ background: 'var(--color-accent)', color: 'var(--color-page)' }}
             >
-              {creating ? 'Creating…' : 'Create'}
+              {creating ? t('creating') : t('create')}
             </button>
             <button
               onClick={() => { setShowInput(false); setNewTitle(''); setError('') }}
               className="px-4 py-1.5 rounded text-sm"
               style={{ background: 'var(--color-chrome)', color: 'var(--color-dim)', border: '1px solid var(--color-border)' }}
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
           {error && <p className="text-xs" style={{ color: '#C0504D' }}>{error}</p>}
@@ -279,7 +283,7 @@ function WelcomeScreen(): JSX.Element {
 
       {projects.length === 0 && !showInput && (
         <p className="text-sm text-center" style={{ color: 'var(--color-dim)', maxWidth: 280 }}>
-          Create your first project to begin.
+          {t('firstProjectHint')}
         </p>
       )}
     </div>

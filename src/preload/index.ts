@@ -49,6 +49,10 @@ const api: ScriptoriumAPI = {
   showItemInFolder: (p) => ipcRenderer.invoke('shell:show-item', p),
 
   getTodayWords: () => ipcRenderer.invoke('stats:today-words'),
+  getAllDailyWords: () => ipcRenderer.invoke('stats:all-words'),
+
+  getJourneyState: () => ipcRenderer.invoke('journey:get'),
+  setJourneyLevel: (levelId, done) => ipcRenderer.invoke('journey:set-level', levelId, done),
 
   on: (channel: IpcPushChannel, fn: Listener): void => {
     const wrapper: IpcWrapper = (_ev, ...args) => fn(...(args as unknown[]))

@@ -2,6 +2,8 @@ import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import useAppStore from '../store/app-store'
 import useEditorStore from '../store/editor-store'
+import { useT } from '../i18n/strings'
+import type { StringKey } from '../i18n/strings'
 
 const SAVE_DOT_COLOR: Record<string, string> = {
   saved: 'var(--color-dim)',
@@ -11,6 +13,7 @@ const SAVE_DOT_COLOR: Record<string, string> = {
 }
 
 export default function StatusBar(): JSX.Element {
+  const t = useT()
   const saveStatus = useAppStore(s => s.saveStatus)
   const selectedNodeId = useAppStore(s => s.selectedNodeId)
   const currentProject = useAppStore(s => s.currentProject)
@@ -31,10 +34,10 @@ export default function StatusBar(): JSX.Element {
   const sessionCount = Math.max(0, sceneWordCount - sessionWordsAtOpen)
 
   const saveText =
-    saveStatus === 'error' ? 'Error saving'
-    : saveStatus === 'saving' ? 'Saving…'
-    : saveStatus === 'unsaved' ? 'Unsaved'
-    : 'Saved'
+    saveStatus === 'error' ? t('errorSaving')
+    : saveStatus === 'saving' ? t('saving')
+    : saveStatus === 'unsaved' ? t('unsaved')
+    : t('saved')
 
   return (
     <div
@@ -50,10 +53,10 @@ export default function StatusBar(): JSX.Element {
       }}
     >
       <div className='flex items-center gap-4'>
-        <span>{sceneWordCount.toLocaleString()} words</span>
-        {sessionCount > 0 && <span>+{sessionCount.toLocaleString()} this session</span>}
-        {todayWords > 0 && <span>{todayWords.toLocaleString()} today</span>}
-        {projectWordCount > 0 && <span>{projectWordCount.toLocaleString()} total</span>}
+        <span>{sceneWordCount.toLocaleString()} {t('words')}</span>
+        {sessionCount > 0 && <span>+{sessionCount.toLocaleString()} {t('thisSession')}</span>}
+        {todayWords > 0 && <span>{todayWords.toLocaleString()} {t('today')}</span>}
+        {projectWordCount > 0 && <span>{projectWordCount.toLocaleString()} {t('total')}</span>}
       </div>
 
       <div>
@@ -65,7 +68,7 @@ export default function StatusBar(): JSX.Element {
             fontSize: '10px',
             opacity: 0.7,
           }}>
-            {selectedNode.status}
+            {t(`status_${selectedNode.status}` as StringKey)}
           </span>
         )}
       </div>

@@ -16,6 +16,7 @@ const DEFAULT_CONFIG: AppConfig = {
   focusMode: false,
   typewriterScrolling: true,
   lastOpenProjectId: null,
+  language: 'ro',
 }
 
 function configPath(): string {

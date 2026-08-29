@@ -1,7 +1,8 @@
 import type { JSX } from 'react'
 import useAppStore from '../../store/app-store'
-import type { AppConfig } from '@shared/types'
+import type { AppConfig, Language } from '@shared/types'
 import { THEMES, THEME_ORDER } from '../../themes/themes'
+import { useT } from '../../i18n/strings'
 
 const FONTS: Array<{ id: string; label: string }> = [
   { id: 'literata', label: 'Literata' },
@@ -46,6 +47,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 export default function SettingsPanel(): JSX.Element {
+  const t = useT()
   const config = useAppStore(s => s.config)
   const setConfig = useAppStore(s => s.setConfig)
 
@@ -68,13 +70,33 @@ export default function SettingsPanel(): JSX.Element {
     >
       <div className='px-4 py-3 border-b' style={{ borderColor: 'var(--color-border)' }}>
         <h2 className='text-xs font-ui uppercase tracking-wider' style={{ color: 'var(--color-dim)' }}>
-          Settings
+          {t('settings')}
         </h2>
       </div>
 
       <div className='px-4 py-2'>
         <p className='text-xs pt-2 pb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.6 }}>
-          THEME
+          {t('language')}
+        </p>
+        <Row label={t('languageName')}>
+          <select
+            value={config.language}
+            onChange={e => apply({ language: e.target.value as Language })}
+            className='text-xs px-2 py-1 rounded'
+            style={{
+              background: 'var(--color-page)',
+              color: 'var(--color-prose)',
+              border: '1px solid var(--color-border)',
+              fontFamily: 'var(--font-ui)',
+            }}
+          >
+            <option value='ro'>Romana</option>
+            <option value='en'>English</option>
+          </select>
+        </Row>
+
+        <p className='text-xs pt-4 pb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.6 }}>
+          {t('theme')}
         </p>
         <div className='flex flex-wrap gap-2 pb-3'>
           {THEME_ORDER.map(id => {
@@ -105,7 +127,7 @@ export default function SettingsPanel(): JSX.Element {
           })}
         </div>
 
-        <Row label='Font'>
+        <Row label={t('font')}>
           <select
             value={config.font}
             onChange={e => apply({ font: e.target.value })}
@@ -123,7 +145,7 @@ export default function SettingsPanel(): JSX.Element {
           </select>
         </Row>
 
-        <Row label={`Font size — ${config.fontSize}px`}>
+        <Row label={`${t('fontSize')} — ${config.fontSize}px`}>
           <input
             type='range' min={13} max={28} step={1}
             value={config.fontSize}
@@ -132,7 +154,7 @@ export default function SettingsPanel(): JSX.Element {
           />
         </Row>
 
-        <Row label={`Line height — ${config.lineHeight.toFixed(1)}`}>
+        <Row label={`${t('lineHeight')} — ${config.lineHeight.toFixed(1)}`}>
           <input
             type='range' min={1.4} max={2.0} step={0.1}
             value={config.lineHeight}
@@ -141,7 +163,7 @@ export default function SettingsPanel(): JSX.Element {
           />
         </Row>
 
-        <Row label={`Line width — ${config.measure >= 300 ? 'Full' : config.measure + 'ch'}`}>
+        <Row label={`${t('lineWidth')} — ${config.measure >= 300 ? t('fullWidth') : config.measure + 'ch'}`}>
           <input
             type='range' min={50} max={300} step={5}
             value={config.measure}
@@ -151,24 +173,24 @@ export default function SettingsPanel(): JSX.Element {
         </Row>
 
         <p className='text-xs pt-4 pb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.6 }}>
-          EDITOR
+          {t('editor')}
         </p>
 
-        <Row label='Smart typography'>
+        <Row label={t('smartTypography')}>
           <Toggle
             checked={config.smartTypography}
             onChange={v => apply({ smartTypography: v })}
           />
         </Row>
 
-        <Row label='Typewriter scrolling'>
+        <Row label={t('typewriterScrolling')}>
           <Toggle
             checked={config.typewriterScrolling}
             onChange={v => apply({ typewriterScrolling: v })}
           />
         </Row>
 
-        <Row label='Focus mode'>
+        <Row label={t('focusMode')}>
           <Toggle
             checked={config.focusMode}
             onChange={v => apply({ focusMode: v })}
@@ -176,12 +198,12 @@ export default function SettingsPanel(): JSX.Element {
         </Row>
 
         <p className='text-xs pt-4 pb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.6 }}>
-          LIBRARY
+          {t('library')}
         </p>
 
         <div className='py-2'>
           <p className='text-xs mb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
-            Projects folder
+            {t('projectsFolder')}
           </p>
           <div className='flex gap-2 items-center'>
             <span
@@ -205,14 +227,14 @@ export default function SettingsPanel(): JSX.Element {
                 cursor: 'pointer',
               }}
             >
-              Change…
+              {t('change')}
             </button>
           </div>
         </div>
 
         <div className='py-2'>
           <p className='text-xs mb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
-            Backups folder
+            {t('backupsFolder')}
           </p>
           <div className='flex gap-2 items-center'>
             <span
@@ -236,7 +258,7 @@ export default function SettingsPanel(): JSX.Element {
                 cursor: 'pointer',
               }}
             >
-              Change…
+              {t('change')}
             </button>
           </div>
         </div>

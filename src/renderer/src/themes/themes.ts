@@ -169,6 +169,45 @@ const newsprint: ThemeDefinition = {
   isLight: true,
 }
 
+const deepsea: ThemeDefinition = {
+  id: 'deepsea',
+  name: 'Deep Sea',
+  page: '#0A1312',
+  prose: '#C2DAD6',
+  dim: '#37514D',
+  chrome: '#0F1B19',
+  border: '#1A2C29',
+  accent: '#4FA79B',
+  selection: '#132824',
+  isLight: false,
+}
+
+const jade: ThemeDefinition = {
+  id: 'jade',
+  name: 'Jade',
+  page: '#EDF3EE',
+  prose: '#1E2B22',
+  dim: '#8A9A8C',
+  chrome: '#E3EBE4',
+  border: '#CBD8CC',
+  accent: '#3F7D58',
+  selection: '#D6E4D8',
+  isLight: true,
+}
+
+const glacier: ThemeDefinition = {
+  id: 'glacier',
+  name: 'Glacier',
+  page: '#EDF2F7',
+  prose: '#1B2836',
+  dim: '#8895A6',
+  chrome: '#E3EAF2',
+  border: '#CBD6E2',
+  accent: '#2F6699',
+  selection: '#D8E2EE',
+  isLight: true,
+}
+
 export const THEMES: Record<string, ThemeDefinition> = {
   nocturne,
   ember,
@@ -183,9 +222,12 @@ export const THEMES: Record<string, ThemeDefinition> = {
   moss,
   graphite,
   newsprint,
+  deepsea,
+  jade,
+  glacier,
 }
 
 export const THEME_ORDER = [
-  'nocturne', 'ember', 'moss', 'tidewater', 'midnight', 'dusk', 'graphite',
-  'vellum', 'sepia', 'newsprint', 'foolscap', 'manuscript', 'terminal',
+  'nocturne', 'ember', 'moss', 'deepsea', 'tidewater', 'midnight', 'dusk', 'graphite',
+  'vellum', 'sepia', 'newsprint', 'jade', 'glacier', 'foolscap', 'manuscript', 'terminal',
 ]

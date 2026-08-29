@@ -16,7 +16,8 @@ import { moveToTrash, listTrash, restoreFromTrash } from '../fs/trash'
 import { searchIndex, upsertDocument, rebuildIndex } from '../db/search-index'
 import { writeCrashJournal, readCrashJournal, clearCrashJournal } from '../crash-journal'
 import { compileProject } from '../compiler'
-import { recordWordDelta, getTodayWords } from '../daily-stats'
+import { recordWordDelta, getTodayWords, getAllDailyWords } from '../daily-stats'
+import { getJourneyState, setJourneyLevel } from '../journey'
 import { countWords } from '../fs/word-count'
 
 export function registerIpcHandlers(db: Database.Database | null): void {
@@ -163,4 +164,12 @@ export function registerIpcHandlers(db: Database.Database | null): void {
   )
 
   ipcMain.handle('stats:today-words', async () => getTodayWords())
+
+  ipcMain.handle('stats:all-words', async () => getAllDailyWords())
+
+  ipcMain.handle('journey:get', async () => getJourneyState())
+
+  ipcMain.handle('journey:set-level', async (_e, levelId: string, done: boolean) =>
+    setJourneyLevel(levelId, done)
+  )
 }

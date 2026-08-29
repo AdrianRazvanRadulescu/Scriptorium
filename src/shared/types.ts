@@ -45,18 +45,26 @@ export interface LoadedProject {
   nodes: Record<string, ProjectNode>
 }
 
+export type Language = 'en' | 'ro'
+
 export interface AppConfig {
   libraryRoot: string // default: D:\Scriptorium
   backupRoot: string // default: C:\Scriptorium-Backups
   theme: string // theme ID, e.g. "nocturne"
   font: string // font ID, e.g. "literata"
-  fontSize: number // 15–24
+  fontSize: number // 13–28
   lineHeight: number // 1.4–2.0
-  measure: number // 55–80 (ch units)
+  measure: number // ch units; >=300 means full width
   smartTypography: boolean
   focusMode: boolean
   typewriterScrolling: boolean
   lastOpenProjectId: string | null
+  language: Language
+}
+
+// Journey progress: levelId -> ISO date when the level was marked done
+export interface JourneyState {
+  completed: Record<string, string>
 }
 
 export interface SnapshotInfo {
