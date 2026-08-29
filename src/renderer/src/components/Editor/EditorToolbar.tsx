@@ -2,6 +2,7 @@ import { useEffect, useState, type JSX } from 'react'
 import useAppStore from '../../store/app-store'
 import { useT } from '../../i18n/strings'
 import { THEMES, THEME_ORDER } from '../../themes/themes'
+import { findStep } from '../../journey/levels'
 import type { AppConfig, Language } from '@shared/types'
 
 function ThemePicker({ config, apply }: {
@@ -143,6 +144,10 @@ export default function EditorToolbar(): JSX.Element {
 
   const isFolder = selectedNode?.type === 'folder' || (!selectedNode && currentProject !== null)
 
+  const language: Language = config?.language ?? 'ro'
+  const step = selectedNode?.journeyStepId ? findStep(selectedNode.journeyStepId) : undefined
+  const sceneTitle = step ? step.title[language] : selectedNode?.title
+
   // Esc leaves fullscreen — unless a modal is open (Esc closes the modal there).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -190,7 +195,7 @@ export default function EditorToolbar(): JSX.Element {
             className='text-xs truncate'
             style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}
           >
-            {selectedNode.title}
+            {sceneTitle}
           </span>
         )}
       </div>

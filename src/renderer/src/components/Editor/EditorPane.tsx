@@ -5,6 +5,7 @@ import { EditorState } from '@codemirror/state'
 import useAppStore from '../../store/app-store'
 import useEditorStore from '../../store/editor-store'
 import { createEditorExtensions } from './codemirror-setup'
+import ExerciseBrief from './ExerciseBrief'
 
 function countWords(text: string): number {
   const cleaned = text.replace(/[*_#~]/g, '').replace(/—/g, ' ').replace(/\.{3,}|…/g, ' ')
@@ -171,12 +172,18 @@ export default function EditorPane(): JSX.Element | null {
 
   return (
     <div
-      className='flex-1 flex justify-center overflow-y-auto'
+      className='flex-1 flex flex-col overflow-y-auto'
       style={{ background: 'var(--color-page)' }}
     >
       <div
+        className='w-full mx-auto px-4 pt-8'
+        style={{ maxWidth: 'var(--measure-prose)' }}
+      >
+        <ExerciseBrief node={selectedNode} />
+      </div>
+      <div
         ref={containerRef}
-        className='w-full py-16 px-4'
+        className='w-full mx-auto py-8 px-4'
         style={{ maxWidth: 'var(--measure-prose)' }}
       />
     </div>

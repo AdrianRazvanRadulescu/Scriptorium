@@ -44,6 +44,7 @@ export async function createProject(libraryRoot: string, title: string): Promise
     synopsis: '',
     wordTarget: null,
     sceneFile: null,
+    journeyStepId: null,
     createdAt: now,
     updatedAt: now,
   }
