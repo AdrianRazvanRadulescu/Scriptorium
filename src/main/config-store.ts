@@ -4,19 +4,23 @@ import type { AppConfig } from '@shared/types'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-const DEFAULT_CONFIG: AppConfig = {
-  libraryRoot: 'D:\\Scriptorium',
-  backupRoot: 'C:\\Scriptorium-Backups',
-  theme: 'nocturne',
-  font: 'literata',
-  fontSize: 18,
-  lineHeight: 1.7,
-  measure: 65,
-  smartTypography: true,
-  focusMode: false,
-  typewriterScrolling: true,
-  lastOpenProjectId: null,
-  language: 'ro',
+// Computed lazily: app.getPath() is only valid once the app is ready, and
+// readConfig() is never called before that.
+function defaultConfig(): AppConfig {
+  return {
+    libraryRoot: path.join(app.getPath('documents'), 'Scriptorium'),
+    backupRoot: path.join(app.getPath('home'), 'Scriptorium-Backups'),
+    theme: 'nocturne',
+    font: 'literata',
+    fontSize: 18,
+    lineHeight: 1.7,
+    measure: 65,
+    smartTypography: true,
+    focusMode: false,
+    typewriterScrolling: true,
+    lastOpenProjectId: null,
+    language: 'ro',
+  }
 }
 
 function configPath(): string {
@@ -28,7 +32,7 @@ export async function readConfig(): Promise<AppConfig> {
   try {
     raw = await fs.readFile(configPath(), 'utf-8')
   } catch {
-    return { ...DEFAULT_CONFIG }
+    return defaultConfig()
   }
 
   // External editors can save this file with a UTF-8 BOM, which JSON.parse rejects.
@@ -36,9 +40,9 @@ export async function readConfig(): Promise<AppConfig> {
   try {
     const parsed = JSON.parse(raw.replace(/^﻿/, '')) as Partial<AppConfig>
     // Spread ensures keys added in future versions get their defaults automatically.
-    return { ...DEFAULT_CONFIG, ...parsed }
+    return { ...defaultConfig(), ...parsed }
   } catch {
-    return { ...DEFAULT_CONFIG }
+    return defaultConfig()
   }
 }
 
