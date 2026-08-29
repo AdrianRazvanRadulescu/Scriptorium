@@ -56,6 +56,16 @@ const en = {
   backupsFolder: 'Backups folder',
   change: 'Change…',
 
+  // Stats modal
+  stats: 'Stats',
+  statsTitle: 'STATISTICS',
+  statsScene: 'current scene',
+  statsSession: 'this session',
+  statsToday: 'today',
+  statsProject: 'project total',
+  statsAllTime: 'all time',
+  close: 'Close',
+
   // Journey panel
   journeyTitle: 'THE PATH',
   journeyProgress: 'of',
@@ -117,6 +127,15 @@ const ro: typeof en = {
   projectsFolder: 'Folder proiecte',
   backupsFolder: 'Folder backupuri',
   change: 'Schimba…',
+
+  stats: 'Statistici',
+  statsTitle: 'STATISTICI',
+  statsScene: 'scena curenta',
+  statsSession: 'sesiunea asta',
+  statsToday: 'azi',
+  statsProject: 'total proiect',
+  statsAllTime: 'de la inceput',
+  close: 'Inchide',
 
   journeyTitle: 'DRUMUL',
   journeyProgress: 'din',

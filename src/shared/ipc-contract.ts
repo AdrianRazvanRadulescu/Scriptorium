@@ -77,6 +77,10 @@ export interface ScriptoriumAPI {
   getJourneyState(): Promise<JourneyState>
   setJourneyLevel(levelId: string, done: boolean): Promise<JourneyState>
 
+  // ── Window ───────────────────────────────────────────────────────────────────
+  toggleFullscreen(): Promise<void>
+  exitFullscreen(): Promise<void>
+
   // ── Event bus (renderer subscribes to main-pushed events) ───────────────────
   on(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void
   off(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void

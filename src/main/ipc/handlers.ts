@@ -1,4 +1,4 @@
-import { ipcMain, dialog, shell } from 'electron'
+import { ipcMain, dialog, shell, BrowserWindow } from 'electron'
 import type Database from 'better-sqlite3'
 import type { AppConfig, CompileOptions, ProjectFile, SearchQuery } from '@shared/types'
 import { readConfig, patchConfig } from '../config-store'
@@ -172,4 +172,14 @@ export function registerIpcHandlers(db: Database.Database | null): void {
   ipcMain.handle('journey:set-level', async (_e, levelId: string, done: boolean) =>
     setJourneyLevel(levelId, done)
   )
+
+  ipcMain.handle('window:toggle-fullscreen', async (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    if (win) win.setFullScreen(!win.isFullScreen())
+  })
+
+  ipcMain.handle('window:exit-fullscreen', async (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    if (win && win.isFullScreen()) win.setFullScreen(false)
+  })
 }
