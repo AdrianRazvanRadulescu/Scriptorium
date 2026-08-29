@@ -16,6 +16,9 @@ export interface ProjectNode {
   synopsis: string // shown on corkboard cards
   wordTarget: number | null
   sceneFile: string | null // e.g. "scenes/abc123-my-scene.md" (relative to projectDir)
+  // Set only on scenes seeded from the Path. Their title and brief come from the
+  // curriculum in the current language instead of this node's fixed title.
+  journeyStepId: string | null
   createdAt: string // ISO 8601
   updatedAt: string
 }

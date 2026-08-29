@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid'
 import useAppStore from '../../store/app-store'
 import useEditorStore from '../../store/editor-store'
 import { reparentNode, reorderChildren } from '../../store/tree-ops'
-import type { ProjectNode } from '@shared/types'
+import { findStep } from '../../journey/levels'
+import type { Language, ProjectNode } from '@shared/types'
 
 const STATUS_COLORS: Record<ProjectNode['status'], string> = {
   idea: '#4A4640',
@@ -60,6 +61,7 @@ function ContextMenu(p: MenuProps): JSX.Element {
 
 export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: number }): JSX.Element | null {
   const { currentProject, selectedNodeId, setSelectedNodeId, updateProjectNodes } = useAppStore()
+  const language: Language = useAppStore(s => s.config?.language) ?? 'ro'
   const { setContent } = useEditorStore()
   const [expanded, setExpanded] = useState(true)
   const [renaming, setRenaming] = useState(false)
@@ -72,6 +74,10 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
   if (!node || !currentProject) return null
   const { nodes, meta, projectDir } = currentProject
   const isSelected = selectedNodeId === nodeId
+
+  // Path scenes carry their title in the curriculum, so it follows the UI language.
+  const journeyStep = node.journeyStepId === null ? undefined : findStep(node.journeyStepId)
+  const displayTitle = journeyStep ? journeyStep.title[language] : node.title
 
   // Stable reference so ContextMenu's useEffect([p.onClose]) doesn't rerun on every
   // parent re-render, which would constantly remove and re-add the mousedown listener.
@@ -94,7 +100,7 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
   }
 
   const startRename = () => {
-    setRenameValue(node.title); setRenaming(true)
+    setRenameValue(displayTitle); setRenaming(true)
     setTimeout(() => inputRef.current?.select(), 0)
   }
   const commitRename = async () => {
@@ -132,7 +138,8 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
     const sceneFile = type === 'scene' ? await window.api.createSceneFile(projectDir, newId, title) : null
     await saveNodes({ ...nodes,
       [newId]: { id: newId, type, title, children: [], pov: '', synopsis: '',
-        status: 'idea', color: 'none', wordTarget: null, sceneFile, parentId: nodeId, createdAt: now, updatedAt: now },
+        status: 'idea', color: 'none', wordTarget: null, sceneFile, journeyStepId: null,
+        parentId: nodeId, createdAt: now, updatedAt: now },
       [nodeId]: { ...node, children: [...node.children, newId] },
     })
     setExpanded(true)
@@ -180,7 +187,7 @@ export default function BinderNode({ nodeId, depth }: { nodeId: string; depth: n
               className='flex-1 text-xs bg-transparent outline-none min-w-0'
               style={{ color: 'var(--color-prose)', boxShadow: '0 0 0 1px var(--color-accent)', borderRadius: 2 }}
             />
-          : <span className='flex-1 text-xs truncate min-w-0' style={{ color: 'var(--color-prose)' }}>{node.title}</span>
+          : <span className='flex-1 text-xs truncate min-w-0' style={{ color: 'var(--color-prose)' }}>{displayTitle}</span>
         }
       </div>
       {node.type === 'folder' && expanded && node.children.map(id =>
