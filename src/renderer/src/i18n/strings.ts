@@ -69,13 +69,12 @@ const en = {
   // Journey panel
   journeyTitle: 'THE PATH',
   journeyProgress: 'of',
-  journeyLevels: 'levels',
-  journeyNext: 'Next',
+  journeySteps: 'steps',
   journeyOnTrack: 'You are on the road.',
-  journeyMarkDone: 'Mark as done',
-  journeyUndoHint: 'Click to mark as not done',
+  journeyToggleHint: 'Click to toggle done',
   journeyLast14: 'LAST 14 DAYS',
   journeyWordsToday: 'today',
+  journeyFinished: 'The path is walked. The next one is yours to ask for.',
 }
 
 const ro: typeof en = {
@@ -139,13 +138,12 @@ const ro: typeof en = {
 
   journeyTitle: 'DRUMUL',
   journeyProgress: 'din',
-  journeyLevels: 'niveluri',
-  journeyNext: 'Urmeaza',
+  journeySteps: 'pasi',
   journeyOnTrack: 'Esti pe drum.',
-  journeyMarkDone: 'Marcheaza terminat',
-  journeyUndoHint: 'Click pentru a marca ne-terminat',
+  journeyToggleHint: 'Click pentru a bifa / debifa',
   journeyLast14: 'ULTIMELE 14 ZILE',
   journeyWordsToday: 'azi',
+  journeyFinished: 'Drumul e parcurs. Urmatorul mi-l ceri cand esti gata.',
 }
 
 const STRINGS: Record<Language, typeof en> = { en, ro }

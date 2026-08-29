@@ -2,48 +2,30 @@ import type { Language } from '@shared/types'
 
 type Bilingual = Record<Language, string>
 
+export interface JourneyStep {
+  id: string
+  text: Bilingual
+}
+
 export interface JourneyLevel {
   id: string
   title: Bilingual
-  // What this level actually teaches — short and direct, no fluff
+  // What this stage actually teaches — short and direct, no fluff
   lesson: Bilingual
-  // The concrete exercise, referencing the matching scene in the Exercitii project
-  exercise: Bilingual
   quote: { text: Bilingual; author: string }
+  steps: JourneyStep[]
 }
 
-// The path from zero to writing short stories. Levels are appended over time —
-// the id is stable and stored in journey.json, so never rename or reorder ids.
+// The path from zero to the first finished short story.
+// Six stages, each broken into small checkable steps — methodical, no filler.
+// Step ids are stored in journey.json, so never rename or reorder them.
 export const LEVELS: JourneyLevel[] = [
-  {
-    id: 'inventory',
-    title: { ro: 'Inventarul', en: 'The Inventory' },
-    lesson: {
-      ro: 'Ce cari in cap nu e inca material. Devine material abia cand e pe hartie, o propozitie pe idee. Ce se repeta in lista e obsesia ta reala.',
-      en: 'What you carry in your head is not material yet. It becomes material only on paper, one sentence per idea. What repeats in the list is your real obsession.',
-    },
-    exercise: {
-      ro: 'Deschide scena "Inventarul din cap" din proiectul Exercitii. O propozitie seaca pentru fiecare scena sau idee pe care o cari in cap.',
-      en: 'Open the "Inventarul din cap" scene in the Exercitii project. One dry sentence for every scene or idea you carry in your head.',
-    },
-    quote: {
-      text: {
-        ro: 'Scriu ca sa aflu ce gandesc.',
-        en: 'I write entirely to find out what I am thinking.',
-      },
-      author: 'Joan Didion',
-    },
-  },
   {
     id: 'concrete',
     title: { ro: 'Concretul', en: 'The Concrete' },
     lesson: {
-      ro: 'Emotia nu se numeste, se arata printr-un obiect. Abstractul e refugiul incepatorului; obiectul precis e ce salveaza pagina.',
-      en: 'Emotion is not named, it is shown through an object. Abstraction is the beginner’s refuge; the precise object is what saves the page.',
-    },
-    exercise: {
-      ro: 'Scena "150 de cuvinte, zero abstractiuni": 150 de cuvinte despre ceva vazut azi. Fara "frumos", "trist", "interesant".',
-      en: 'Scene "150 de cuvinte, zero abstractiuni": 150 words about something you saw today. No "beautiful", "sad", "interesting".',
+      ro: 'Ochiul inainte de fraza. Emotia nu se numeste — se arata printr-un obiect precis.',
+      en: 'The eye before the sentence. Emotion is not named — it is shown through a precise object.',
     },
     quote: {
       text: {
@@ -52,17 +34,43 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'Anton Cehov',
     },
+    steps: [
+      {
+        id: 'concrete.inventory',
+        text: {
+          ro: 'Inventarul: o propozitie seaca pentru fiecare idee pe care o cari in cap. Ce se repeta e materialul tau adevarat.',
+          en: 'The inventory: one dry sentence for every idea you carry in your head. What repeats is your real material.',
+        },
+      },
+      {
+        id: 'concrete.150',
+        text: {
+          ro: '150 de cuvinte despre ceva vazut azi. Zero adjective abstracte: fara frumos, trist, interesant.',
+          en: '150 words about something you saw today. Zero abstract adjectives: no beautiful, sad, interesting.',
+        },
+      },
+      {
+        id: 'concrete.room',
+        text: {
+          ro: 'O camera descrisa asa incat cititorul sa stie cine locuieste in ea, fara sa-l numesti.',
+          en: 'A room described so the reader knows who lives there, without naming them.',
+        },
+      },
+      {
+        id: 'concrete.ten-lines',
+        text: {
+          ro: 'Zece randuri numai din lucruri concrete. Interzis: suflet, dor, vesnicie, lacrima.',
+          en: 'Ten lines made only of concrete things. Forbidden: soul, longing, eternity, tear.',
+        },
+      },
+    ],
   },
   {
     id: 'voice',
     title: { ro: 'Vocea', en: 'The Voice' },
     lesson: {
-      ro: 'Cine povesteste conteaza mai mult decat ce se intampla. Starea unui om se vede in propozitiile lui — lungimea lor, ce observa, ce repeta — nu in etichete.',
-      en: 'Who tells matters more than what happens. A man’s state shows in his sentences — their length, what he notices, what he repeats — not in labels.',
-    },
-    exercise: {
-      ro: 'Scena "Trei pagini, acelasi om, trei stadii": acelasi personaj la trei momente din degradare. Interzis sa numesti starea.',
-      en: 'Scene "Trei pagini, acelasi om, trei stadii": the same character at three stages of decline. Naming the state is forbidden.',
+      ro: 'Starea unui om se vede in propozitiile lui — lungimea lor, ce observa, ce repeta — nu in etichete.',
+      en: 'A man’s state shows in his sentences — their length, what he notices, what he repeats — not in labels.',
     },
     quote: {
       text: {
@@ -71,17 +79,36 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'Raymond Carver',
     },
+    steps: [
+      {
+        id: 'voice.waiting',
+        text: {
+          ro: 'O pagina din capul unui om care asteapta pe cineva care intarzie. Fara cuvantul "ingrijorat".',
+          en: 'One page inside the head of a man waiting for someone who is late. Without the word "worried".',
+        },
+      },
+      {
+        id: 'voice.three-stages',
+        text: {
+          ro: 'Acelasi om, trei momente din degradare. Trei pagini. Interzis sa numesti starea.',
+          en: 'The same man, three moments of decline. Three pages. Naming the state is forbidden.',
+        },
+      },
+      {
+        id: 'voice.two-narrators',
+        text: {
+          ro: 'Acelasi eveniment banal, doi naratori: unul crede ca e iubit, altul ca e urmarit.',
+          en: 'The same mundane event, two narrators: one believes he is loved, one believes he is followed.',
+        },
+      },
+    ],
   },
   {
     id: 'dialogue',
     title: { ro: 'Dialogul', en: 'The Dialogue' },
     lesson: {
-      ro: 'Oamenii nu spun ce vor. Dialogul adevarat e ce se misca sub cuvinte — restul e doar schimb de informatii.',
-      en: 'People do not say what they want. Real dialogue is what moves beneath the words — the rest is just an exchange of information.',
-    },
-    exercise: {
-      ro: 'Scena "Dialog cu vrute ascunse": o pagina, doi oameni care vor lucruri diferite si niciunul nu spune direct ce vrea.',
-      en: 'Scene "Dialog cu vrute ascunse": one page, two people who want different things and neither says it directly.',
+      ro: 'Oamenii nu spun ce vor. Dialogul adevarat e ce se misca sub cuvinte.',
+      en: 'People do not say what they want. Real dialogue is what moves beneath the words.',
     },
     quote: {
       text: {
@@ -90,36 +117,36 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'Ernest Hemingway',
     },
-  },
-  {
-    id: 'perspective',
-    title: { ro: 'Perspectiva', en: 'The Perspective' },
-    lesson: {
-      ro: 'Faptele nu exista singure. Fiecare narator vede alta poveste in acelasi eveniment — iar cititorul il cunoaste pe narator din ce alege sa vada.',
-      en: 'Facts do not exist alone. Each narrator sees a different story in the same event — and the reader knows the narrator by what he chooses to see.',
-    },
-    exercise: {
-      ro: 'Scena "Acelasi eveniment, doi naratori": acelasi eveniment banal, o data povestit de unul care crede ca e iubit, o data de unul care crede ca e urmarit.',
-      en: 'Scene "Acelasi eveniment, doi naratori": the same mundane event, told once by someone who believes he is loved, once by someone who believes he is followed.',
-    },
-    quote: {
-      text: {
-        ro: 'Nu exista fapte, doar interpretari.',
-        en: 'There are no facts, only interpretations.',
+    steps: [
+      {
+        id: 'dialogue.hidden-wants',
+        text: {
+          ro: 'O pagina de dialog: doi oameni care vor lucruri diferite si niciunul nu spune direct.',
+          en: 'One page of dialogue: two people who want different things and neither says it directly.',
+        },
       },
-      author: 'Friedrich Nietzsche',
-    },
+      {
+        id: 'dialogue.cut-info',
+        text: {
+          ro: 'Reia pagina si taie orice replica ce doar da informatie. Ce ramane e dialog.',
+          en: 'Take the page again and cut every line that merely gives information. What remains is dialogue.',
+        },
+      },
+      {
+        id: 'dialogue.quiet-fight',
+        text: {
+          ro: 'O cearta in care niciunul nu ridica vocea si niciunul nu spune de la ce e cearta de fapt.',
+          en: 'A fight where neither raises their voice and neither says what the fight is really about.',
+        },
+      },
+    ],
   },
   {
-    id: 'justification',
-    title: { ro: 'Indreptatirea', en: 'The Justification' },
+    id: 'character',
+    title: { ro: 'Personajul', en: 'The Character' },
     lesson: {
-      ro: 'Nimeni nu e ticalos in propria poveste. Personajul care se indreptateste singur e mai adevarat decat cel judecat de autor.',
-      en: 'No one is a villain in his own story. The character who justifies himself is truer than the one judged by the author.',
-    },
-    exercise: {
-      ro: 'Scena "O ticalosie mica, indreptatita imediat": o pagina in care personajul comite o ticalosie mica si gaseste imediat motivul pentru care era indreptatit.',
-      en: 'Scene "O ticalosie mica, indreptatita imediat": one page where the character commits a small meanness and immediately finds the reason he was entitled to it.',
+      ro: 'Nimeni nu e ticalos in propria poveste. Personajul adevarat se indreptateste singur.',
+      en: 'No one is a villain in his own story. The true character justifies himself.',
     },
     quote: {
       text: {
@@ -128,17 +155,36 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'F.M. Dostoievski',
     },
+    steps: [
+      {
+        id: 'character.meanness',
+        text: {
+          ro: 'O ticalosie mica, urmata imediat de motivul pentru care personajul era indreptatit.',
+          en: 'A small meanness, followed immediately by the reason the character was entitled to it.',
+        },
+      },
+      {
+        id: 'character.ugly-kindness',
+        text: {
+          ro: 'Un gest de bunatate facut din motive urate. Nu numi motivele.',
+          en: 'An act of kindness done for ugly reasons. Do not name the reasons.',
+        },
+      },
+      {
+        id: 'character.denied-want',
+        text: {
+          ro: 'Personajul vrea ceva banal si concret si nu-l obtine. O pagina.',
+          en: 'The character wants something mundane and concrete and does not get it. One page.',
+        },
+      },
+    ],
   },
   {
-    id: 'imitation',
-    title: { ro: 'Imitatia', en: 'The Imitation' },
+    id: 'scene',
+    title: { ro: 'Scena', en: 'The Scene' },
     lesson: {
-      ro: 'Vocea proprie nu se gaseste in gol. Se gaseste rescriind constient pe cei pe care ii admiri, pana vezi cum e facuta fraza pe dinauntru.',
-      en: 'Your own voice is not found in a void. It is found by consciously rewriting those you admire, until you see how the sentence is built from the inside.',
-    },
-    exercise: {
-      ro: 'Scena "Rescriere dupa un autor": o pagina dintr-un autor iubit, rescrisa cu personajele si locul tau.',
-      en: 'Scene "Rescriere dupa un autor": a page from an author you love, rewritten with your characters and your place.',
+      ro: 'Povestile sunt facute din scene. O scena: cineva intra vrand ceva si iese schimbat.',
+      en: 'Stories are made of scenes. A scene: someone enters wanting something and leaves changed.',
     },
     quote: {
       text: {
@@ -147,17 +193,36 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'Cormac McCarthy',
     },
+    steps: [
+      {
+        id: 'scene.complete',
+        text: {
+          ro: 'O scena completa de 500-800 de cuvinte: personajul intra cu o dorinta, iese schimbat.',
+          en: 'A complete scene of 500-800 words: the character enters with a want, leaves changed.',
+        },
+      },
+      {
+        id: 'scene.late-early',
+        text: {
+          ro: 'Taie primul si ultimul paragraf din scena. Intra tarziu, iesi devreme.',
+          en: 'Cut the first and last paragraph of the scene. Enter late, leave early.',
+        },
+      },
+      {
+        id: 'scene.imitation',
+        text: {
+          ro: 'O pagina dintr-un autor iubit, rescrisa cu personajele si locul tau. Vezi cum e facuta fraza pe dinauntru.',
+          en: 'A page from an author you love, rewritten with your characters and your place. See how the sentence is built from the inside.',
+        },
+      },
+    ],
   },
   {
-    id: 'first-story',
-    title: { ro: 'Prima povestire', en: 'The First Story' },
+    id: 'story',
+    title: { ro: 'Povestea scurta', en: 'The Short Story' },
     lesson: {
-      ro: 'A termina e o abilitate separata de a scrie bine — si se antreneaza doar terminand. O povestire dusa la capat valoreaza mai mult decat trei inceputuri stralucite.',
-      en: 'Finishing is a skill separate from writing well — and it is trained only by finishing. One story carried to the end is worth more than three brilliant beginnings.',
-    },
-    exercise: {
-      ro: 'In proiectul Povestiri: o povestire de 1500-3000 de cuvinte, dusa pana la capat, oricat de imperfecta ar iesi.',
-      en: 'In the Povestiri project: a story of 1500-3000 words, carried to the end, however imperfect it turns out.',
+      ro: 'A termina e o abilitate separata de a scrie bine. Se antreneaza doar terminand.',
+      en: 'Finishing is a skill separate from writing well. It is trained only by finishing.',
     },
     quote: {
       text: {
@@ -166,5 +231,37 @@ export const LEVELS: JourneyLevel[] = [
       },
       author: 'E.L. Doctorow',
     },
+    steps: [
+      {
+        id: 'story.pick',
+        text: {
+          ro: 'Alege din inventar ideea la care tii cel mai putin. Pe aia o scrii prima — nu doare daca iese prost.',
+          en: 'Pick from the inventory the idea you care about least. That one goes first — it does not hurt if it comes out bad.',
+        },
+      },
+      {
+        id: 'story.outline',
+        text: {
+          ro: 'Schita in cinci propozitii: cine vrea ce, ce ii sta in cale, ce se schimba la final.',
+          en: 'An outline in five sentences: who wants what, what stands in the way, what changes at the end.',
+        },
+      },
+      {
+        id: 'story.write',
+        text: {
+          ro: 'Scrie povestirea: 1500-3000 de cuvinte, in proiectul Povestiri. Dusa pana la capat, oricat de imperfecta.',
+          en: 'Write the story: 1500-3000 words, in the Povestiri project. Carried to the end, however imperfect.',
+        },
+      },
+      {
+        id: 'story.cut',
+        text: {
+          ro: 'Las-o trei zile. Reciteste-o cu creionul si taie 10 la suta.',
+          en: 'Leave it for three days. Reread it with a pencil and cut 10 percent.',
+        },
+      },
+    ],
   },
 ]
+
+export const TOTAL_STEPS = LEVELS.reduce((sum, level) => sum + level.steps.length, 0)

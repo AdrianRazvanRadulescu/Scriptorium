@@ -2,10 +2,11 @@ import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import useAppStore from '../../store/app-store'
 import { useT } from '../../i18n/strings'
-import { LEVELS } from '../../journey/levels'
+import { LEVELS, TOTAL_STEPS } from '../../journey/levels'
+import type { JourneyLevel } from '../../journey/levels'
 import type { JourneyState, Language } from '@shared/types'
 
-const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
 function lastFourteenDays(allWords: Record<string, number>): Array<{ date: string; words: number }> {
   const days: Array<{ date: string; words: number }> = []
@@ -20,6 +21,10 @@ function lastFourteenDays(allWords: Record<string, number>): Array<{ date: strin
   return days
 }
 
+function levelDoneCount(level: JourneyLevel, completed: Record<string, string>): number {
+  return level.steps.filter(s => completed[s.id]).length
+}
+
 export default function JourneyPanel(): JSX.Element {
   const t = useT()
   const language: Language = useAppStore(s => s.config?.language) ?? 'ro'
@@ -31,20 +36,22 @@ export default function JourneyPanel(): JSX.Element {
     window.api.getJourneyState().then(setJourney).catch(() => {})
   }, [])
 
-  // Keep the daily bars fresh while he writes with the panel open
   useEffect(() => {
     if (saveStatus === 'saved') {
       window.api.getAllDailyWords().then(setDailyWords).catch(() => {})
     }
   }, [saveStatus])
 
-  const toggleLevel = (levelId: string, done: boolean) => {
-    window.api.setJourneyLevel(levelId, done).then(setJourney).catch(() => {})
+  const toggleStep = (stepId: string) => {
+    const done = !journey.completed[stepId]
+    window.api.setJourneyLevel(stepId, done).then(setJourney).catch(() => {})
   }
 
-  const completedCount = LEVELS.filter(l => journey.completed[l.id]).length
-  const currentIndex = LEVELS.findIndex(l => !journey.completed[l.id])
-  const current = currentIndex === -1 ? null : LEVELS[currentIndex]
+  const doneSteps = LEVELS.reduce((sum, l) => sum + levelDoneCount(l, journey.completed), 0)
+  const currentLevelIndex = LEVELS.findIndex(
+    l => levelDoneCount(l, journey.completed) < l.steps.length
+  )
+  const allDone = currentLevelIndex === -1
 
   const days = lastFourteenDays(dailyWords)
   const maxDay = Math.max(1, ...days.map(d => d.words))
@@ -52,130 +59,142 @@ export default function JourneyPanel(): JSX.Element {
 
   return (
     <aside
-      className='flex flex-col h-full shrink-0 border-l overflow-y-auto'
+      className='flex flex-col h-full shrink-0 border-r overflow-y-auto'
       style={{
-        width: '320px',
+        width: '330px',
         background: 'var(--color-chrome)',
         borderColor: 'var(--color-border)',
       }}
     >
-      <div className='px-4 py-3 border-b' style={{ borderColor: 'var(--color-border)' }}>
+      <div className='px-4 py-3 border-b flex items-baseline justify-between' style={{ borderColor: 'var(--color-border)' }}>
         <h2 className='text-xs uppercase tracking-wider' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
           {t('journeyTitle')}
         </h2>
+        <span className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
+          {doneSteps} {t('journeyProgress')} {TOTAL_STEPS} {t('journeySteps')}
+        </span>
       </div>
 
-      <div className='px-4 py-4 flex-1'>
-        {/* Progress */}
-        <div className='pb-1 flex items-baseline justify-between'>
-          <span className='text-xs' style={{ color: 'var(--color-prose)', fontFamily: 'var(--font-ui)' }}>
-            {completedCount} {t('journeyProgress')} {LEVELS.length} {t('journeyLevels')}
-          </span>
-          {completedCount > 0 && (
-            <span className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
-              {t('journeyOnTrack')}
-            </span>
-          )}
-        </div>
-        <div style={{ height: 2, background: 'var(--color-border)', borderRadius: 1 }}>
-          <div
-            style={{
-              height: 2,
-              width: `${(completedCount / LEVELS.length) * 100}%`,
-              background: 'var(--color-accent)',
-              borderRadius: 1,
-              transition: 'width 300ms ease',
-            }}
-          />
-        </div>
+      <div style={{ height: 2, background: 'var(--color-border)' }}>
+        <div
+          style={{
+            height: 2,
+            width: `${(doneSteps / TOTAL_STEPS) * 100}%`,
+            background: 'var(--color-accent)',
+            transition: 'width 300ms ease',
+          }}
+        />
+      </div>
 
-        {/* Completed levels — compact, click to undo */}
-        {completedCount > 0 && (
-          <div className='pt-4'>
-            {LEVELS.map((level, i) =>
-              journey.completed[level.id] ? (
-                <button
-                  key={level.id}
-                  onClick={() => toggleLevel(level.id, false)}
-                  title={t('journeyUndoHint')}
-                  className='block w-full text-left text-xs py-1'
-                  style={{
-                    color: 'var(--color-dim)',
-                    fontFamily: 'var(--font-ui)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ color: 'var(--color-accent)', marginRight: 8 }}>✓</span>
-                  {ROMAN[i]}. {level.title[language]}
-                </button>
-              ) : null
-            )}
-          </div>
+      <div className='px-4 py-3 flex-1'>
+        {allDone && (
+          <p className='text-xs py-4' style={{ color: 'var(--color-prose)', fontFamily: 'var(--font-prose)', fontStyle: 'italic', lineHeight: 1.6 }}>
+            {t('journeyFinished')}
+          </p>
         )}
 
-        {/* Current level */}
-        {current && (
-          <div
-            className='mt-4 px-4 py-4'
-            style={{
-              borderLeft: '2px solid var(--color-accent)',
-              background: 'var(--color-page)',
-              borderRadius: '0 6px 6px 0',
-            }}
-          >
-            <p className='text-xs pb-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
-              {ROMAN[currentIndex]}
-            </p>
-            <h3 style={{ fontFamily: 'var(--font-prose)', fontSize: '1.25rem', color: 'var(--color-prose)', marginBottom: 10 }}>
-              {current.title[language]}
-            </h3>
-            <p className='text-xs' style={{ color: 'var(--color-prose)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, marginBottom: 10 }}>
-              {current.lesson[language]}
-            </p>
-            <p className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, marginBottom: 14 }}>
-              {current.exercise[language]}
-            </p>
+        {LEVELS.map((level, levelIndex) => {
+          const done = levelDoneCount(level, journey.completed)
+          const isComplete = done === level.steps.length
+          const isCurrent = levelIndex === currentLevelIndex
+          const isFuture = !isComplete && !isCurrent
 
-            <blockquote style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12, marginBottom: 14 }}>
-              <p style={{ fontFamily: 'var(--font-prose)', fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-prose)', lineHeight: 1.6 }}>
-                {current.quote.text[language]}
-              </p>
-              <p className='text-xs pt-1 text-right' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
-                — {current.quote.author}
-              </p>
-            </blockquote>
+          if (isComplete) {
+            return (
+              <div key={level.id} className='py-1 flex items-baseline gap-2'>
+                <span className='text-xs' style={{ color: 'var(--color-accent)' }}>✓</span>
+                <span className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
+                  {ROMAN[levelIndex]}. {level.title[language]}
+                </span>
+              </div>
+            )
+          }
 
-            <button
-              onClick={() => toggleLevel(current.id, true)}
-              className='text-xs px-3 py-1.5 rounded'
+          if (isFuture) {
+            return (
+              <div key={level.id} className='py-1'>
+                <span className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.45 }}>
+                  {ROMAN[levelIndex]}. {level.title[language]}
+                </span>
+              </div>
+            )
+          }
+
+          // Current level — expanded card with its steps
+          const firstUndoneIndex = level.steps.findIndex(s => !journey.completed[s.id])
+          return (
+            <div
+              key={level.id}
+              className='my-2 px-4 py-4'
               style={{
-                background: 'none',
-                color: 'var(--color-accent)',
-                border: '1px solid var(--color-accent)',
-                fontFamily: 'var(--font-ui)',
-                cursor: 'pointer',
+                borderLeft: '2px solid var(--color-accent)',
+                background: 'var(--color-page)',
+                borderRadius: '0 6px 6px 0',
               }}
             >
-              {t('journeyMarkDone')}
-            </button>
-          </div>
-        )}
-
-        {/* Upcoming levels — titles only, dim */}
-        {currentIndex !== -1 && currentIndex < LEVELS.length - 1 && (
-          <div className='pt-4'>
-            {LEVELS.slice(currentIndex + 1).map((level, i) => (
-              <p key={level.id} className='text-xs py-1' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.5 }}>
-                {ROMAN[currentIndex + 1 + i]}. {level.title[language]}
+              <p className='text-xs pb-1 flex items-baseline justify-between' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
+                <span>{ROMAN[levelIndex]}</span>
+                <span>{done}/{level.steps.length}</span>
               </p>
-            ))}
-          </div>
-        )}
+              <h3 style={{ fontFamily: 'var(--font-prose)', fontSize: '1.3rem', color: 'var(--color-prose)', marginBottom: 8 }}>
+                {level.title[language]}
+              </h3>
+              <p className='text-xs' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, marginBottom: 14 }}>
+                {level.lesson[language]}
+              </p>
+
+              <div className='flex flex-col gap-1'>
+                {level.steps.map((step, stepIndex) => {
+                  const stepDone = Boolean(journey.completed[step.id])
+                  const isActiveStep = stepIndex === firstUndoneIndex
+                  return (
+                    <button
+                      key={step.id}
+                      onClick={() => toggleStep(step.id)}
+                      title={t('journeyToggleHint')}
+                      className='flex items-start gap-3 text-left py-1.5'
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 0' }}
+                    >
+                      <span
+                        className='shrink-0'
+                        style={{
+                          width: 14, height: 14, borderRadius: '50%', marginTop: 1,
+                          border: `1.5px solid ${stepDone || isActiveStep ? 'var(--color-accent)' : 'var(--color-dim)'}`,
+                          background: stepDone ? 'var(--color-accent)' : 'transparent',
+                        }}
+                      />
+                      <span
+                        className='text-xs'
+                        style={{
+                          fontFamily: 'var(--font-ui)',
+                          lineHeight: 1.55,
+                          color: stepDone
+                            ? 'var(--color-dim)'
+                            : isActiveStep ? 'var(--color-prose)' : 'var(--color-dim)',
+                          textDecoration: stepDone ? 'line-through' : 'none',
+                          opacity: stepDone ? 0.65 : 1,
+                        }}
+                      >
+                        {step.text[language]}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <blockquote style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12, marginTop: 10 }}>
+                <p style={{ fontFamily: 'var(--font-prose)', fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-prose)', lineHeight: 1.6 }}>
+                  {level.quote.text[language]}
+                </p>
+                <p className='text-xs pt-1 text-right' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)' }}>
+                  — {level.quote.author}
+                </p>
+              </blockquote>
+            </div>
+          )
+        })}
       </div>
 
-      {/* Daily words — last 14 days */}
       <div className='px-4 py-4 border-t' style={{ borderColor: 'var(--color-border)' }}>
         <p className='text-xs pb-2 uppercase tracking-wider' style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', opacity: 0.6 }}>
           {t('journeyLast14')}
