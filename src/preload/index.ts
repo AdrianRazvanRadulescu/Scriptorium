@@ -54,6 +54,9 @@ const api: ScriptoriumAPI = {
   getJourneyState: () => ipcRenderer.invoke('journey:get'),
   setJourneyLevel: (levelId, done) => ipcRenderer.invoke('journey:set-level', levelId, done),
 
+  toggleFullscreen: () => ipcRenderer.invoke('window:toggle-fullscreen'),
+  exitFullscreen: () => ipcRenderer.invoke('window:exit-fullscreen'),
+
   on: (channel: IpcPushChannel, fn: Listener): void => {
     const wrapper: IpcWrapper = (_ev, ...args) => fn(...(args as unknown[]))
     wrappers.set(fn, wrapper)

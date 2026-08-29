@@ -2,6 +2,7 @@ import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import useAppStore from '../store/app-store'
 import useEditorStore from '../store/editor-store'
+import StatsModal from './StatsModal'
 import { useT } from '../i18n/strings'
 import type { StringKey } from '../i18n/strings'
 
@@ -21,6 +22,7 @@ export default function StatusBar(): JSX.Element {
   const setRightPanel = useAppStore(s => s.setRightPanel)
   const { sceneWordCount, sessionWordsAtOpen, projectWordCount } = useEditorStore()
   const [todayWords, setTodayWords] = useState(0)
+  const [statsOpen, setStatsOpen] = useState(false)
 
   // Refresh the daily counter on mount and after every completed save.
   useEffect(() => {
@@ -53,6 +55,17 @@ export default function StatusBar(): JSX.Element {
       }}
     >
       <div className='flex items-center gap-4'>
+        <button
+          onClick={() => setStatsOpen(true)}
+          title={t('stats')}
+          style={{
+            background: 'none', border: '1px solid var(--color-border)', cursor: 'pointer',
+            color: 'var(--color-dim)', fontFamily: 'var(--font-ui)', fontSize: '11px',
+            padding: '1px 8px', borderRadius: 3,
+          }}
+        >
+          {t('stats')}
+        </button>
         <span>{sceneWordCount.toLocaleString()} {t('words')}</span>
         {sessionCount > 0 && <span>+{sessionCount.toLocaleString()} {t('thisSession')}</span>}
         {todayWords > 0 && <span>{todayWords.toLocaleString()} {t('today')}</span>}
@@ -95,6 +108,8 @@ export default function StatusBar(): JSX.Element {
           ⚙
         </button>
       </div>
+
+      {statsOpen && <StatsModal onClose={() => setStatsOpen(false)} />}
     </div>
   )
 }
