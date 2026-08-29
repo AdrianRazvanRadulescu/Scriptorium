@@ -38,6 +38,10 @@ export async function getTodayWords(): Promise<number> {
   return stats[todayKey()] ?? 0
 }
 
+export async function getAllDailyWords(): Promise<DailyWords> {
+  return readStats()
+}
+
 export async function getTotalWords(): Promise<number> {
   const stats = await readStats()
   return Object.values(stats).reduce((sum, n) => sum + n, 0)

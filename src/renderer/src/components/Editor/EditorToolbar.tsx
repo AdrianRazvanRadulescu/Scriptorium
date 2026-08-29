@@ -1,5 +1,6 @@
 import { useEffect, type JSX } from 'react'
 import useAppStore from '../../store/app-store'
+import { useT } from '../../i18n/strings'
 
 function Btn({
   label,
@@ -31,6 +32,7 @@ function Btn({
 }
 
 export default function EditorToolbar(): JSX.Element {
+  const t = useT()
   const {
     selectedNodeId, currentProject, folderView, rightPanel,
     setFolderView, setRightPanel, toggleBinder, binderOpen,
@@ -74,12 +76,12 @@ export default function EditorToolbar(): JSX.Element {
         {isFolder && (
           <>
             <Btn
-              label='Corkboard'
+              label={t('corkboard')}
               active={folderView === 'corkboard'}
               onClick={() => setFolderView('corkboard')}
             />
             <Btn
-              label='Outline'
+              label={t('outline')}
               active={folderView === 'outline'}
               onClick={() => setFolderView('outline')}
             />
@@ -96,33 +98,34 @@ export default function EditorToolbar(): JSX.Element {
       </div>
       <div className='flex items-center gap-1 flex-shrink-0'>
         <Btn
-          label='Search'
+          label={t('journey')}
+          active={rightPanel === 'journey'}
+          onClick={() => setRightPanel(rightPanel === 'journey' ? 'none' : 'journey')}
+        />
+        <Btn
+          label={t('search')}
           active={rightPanel === 'search'}
           onClick={() => setRightPanel(rightPanel === 'search' ? 'none' : 'search')}
-          title='Search'
         />
         <Btn
-          label='Snapshots'
+          label={t('snapshots')}
           active={rightPanel === 'snapshots'}
           onClick={() => setRightPanel(rightPanel === 'snapshots' ? 'none' : 'snapshots')}
-          title='Snapshots'
         />
         <Btn
-          label='Bible'
+          label={t('bible')}
           active={rightPanel === 'bible'}
           onClick={() => setRightPanel(rightPanel === 'bible' ? 'none' : 'bible')}
-          title='Story Bible'
         />
         {currentProject !== null && (
           <Btn
-            label='Compile'
+            label={t('compile')}
             active={false}
             onClick={() => setCompileDialogOpen(true)}
-            title='Export / Compile'
           />
         )}
-        <Btn label='Fullscreen' active={false} onClick={toggleFullscreen} title='Fullscreen (F11)' />
-        <Btn label='Binder' active={binderOpen} onClick={toggleBinder} title='Toggle Binder' />
+        <Btn label={t('fullscreen')} active={false} onClick={toggleFullscreen} title='F11' />
+        <Btn label={t('binder')} active={binderOpen} onClick={toggleBinder} />
       </div>
     </div>
   )

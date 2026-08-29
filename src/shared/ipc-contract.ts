@@ -2,6 +2,7 @@ import type {
   AppConfig,
   CompileOptions,
   IntegrityReport,
+  JourneyState,
   LoadedProject,
   ProjectFile,
   ProjectSummary,
@@ -70,6 +71,11 @@ export interface ScriptoriumAPI {
 
   // ── Writing stats ────────────────────────────────────────────────────────────
   getTodayWords(): Promise<number>
+  getAllDailyWords(): Promise<Record<string, number>>
+
+  // ── Journey ──────────────────────────────────────────────────────────────────
+  getJourneyState(): Promise<JourneyState>
+  setJourneyLevel(levelId: string, done: boolean): Promise<JourneyState>
 
   // ── Event bus (renderer subscribes to main-pushed events) ───────────────────
   on(channel: IpcPushChannel, listener: (...args: unknown[]) => void): void
