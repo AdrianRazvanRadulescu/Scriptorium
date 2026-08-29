@@ -141,6 +141,7 @@ export default function App(): JSX.Element {
         className="flex h-screen overflow-hidden"
         style={{ background: 'var(--color-page)', color: 'var(--color-prose)' }}
       >
+        {rightPanel === 'journey' && <JourneyPanel />}
         {binderOpen && <BinderPanel />}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <EditorToolbar />
@@ -156,7 +157,6 @@ export default function App(): JSX.Element {
         {rightPanel === 'snapshots' && <SnapshotsPanel />}
         {rightPanel === 'bible' && <StoryBiblePanel />}
         {rightPanel === 'settings' && <SettingsPanel />}
-        {rightPanel === 'journey' && <JourneyPanel />}
       </div>
       {compileDialogOpen && <CompileDialog onClose={() => setCompileDialogOpen(false)} />}
       <CrashRecoveryModal />
