@@ -48,6 +48,8 @@ const api: ScriptoriumAPI = {
 
   showItemInFolder: (p) => ipcRenderer.invoke('shell:show-item', p),
 
+  getTodayWords: () => ipcRenderer.invoke('stats:today-words'),
+
   on: (channel: IpcPushChannel, fn: Listener): void => {
     const wrapper: IpcWrapper = (_ev, ...args) => fn(...(args as unknown[]))
     wrappers.set(fn, wrapper)

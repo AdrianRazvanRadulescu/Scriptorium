@@ -23,16 +23,21 @@ function configPath(): string {
 }
 
 export async function readConfig(): Promise<AppConfig> {
+  let raw: string
   try {
-    const raw = await fs.readFile(configPath(), 'utf-8')
-    const parsed = JSON.parse(raw) as Partial<AppConfig>
+    raw = await fs.readFile(configPath(), 'utf-8')
+  } catch {
+    return { ...DEFAULT_CONFIG }
+  }
+
+  // External editors can save this file with a UTF-8 BOM, which JSON.parse rejects.
+  // A config we cannot parse must not kill startup — the window would never appear.
+  try {
+    const parsed = JSON.parse(raw.replace(/^﻿/, '')) as Partial<AppConfig>
     // Spread ensures keys added in future versions get their defaults automatically.
     return { ...DEFAULT_CONFIG, ...parsed }
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-      return { ...DEFAULT_CONFIG }
-    }
-    throw err
+  } catch {
+    return { ...DEFAULT_CONFIG }
   }
 }
 

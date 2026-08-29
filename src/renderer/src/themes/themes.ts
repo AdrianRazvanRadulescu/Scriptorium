@@ -130,6 +130,45 @@ const manuscript: ThemeDefinition = {
   isLight: true,
 }
 
+const moss: ThemeDefinition = {
+  id: 'moss',
+  name: 'Moss',
+  page: '#0E120E',
+  prose: '#CDD8C8',
+  dim: '#3E4A3C',
+  chrome: '#131A13',
+  border: '#1E281E',
+  accent: '#7FA870',
+  selection: '#16241A',
+  isLight: false,
+}
+
+const graphite: ThemeDefinition = {
+  id: 'graphite',
+  name: 'Graphite',
+  page: '#141414',
+  prose: '#D6D6D6',
+  dim: '#464646',
+  chrome: '#1B1B1B',
+  border: '#282828',
+  accent: '#A8A8A8',
+  selection: '#262626',
+  isLight: false,
+}
+
+const newsprint: ThemeDefinition = {
+  id: 'newsprint',
+  name: 'Newsprint',
+  page: '#EFEDE8',
+  prose: '#26241F',
+  dim: '#8F8B82',
+  chrome: '#E6E4DE',
+  border: '#D2CFC7',
+  accent: '#6B5D4F',
+  selection: '#DCD9D0',
+  isLight: true,
+}
+
 export const THEMES: Record<string, ThemeDefinition> = {
   nocturne,
   ember,
@@ -141,9 +180,12 @@ export const THEMES: Record<string, ThemeDefinition> = {
   midnight,
   dusk,
   manuscript,
+  moss,
+  graphite,
+  newsprint,
 }
 
 export const THEME_ORDER = [
-  'nocturne', 'ember', 'tidewater', 'midnight', 'dusk',
-  'vellum', 'sepia', 'foolscap', 'manuscript', 'terminal',
+  'nocturne', 'ember', 'moss', 'tidewater', 'midnight', 'dusk', 'graphite',
+  'vellum', 'sepia', 'newsprint', 'foolscap', 'manuscript', 'terminal',
 ]
