@@ -19,12 +19,12 @@ Scriptorium is an offline desktop app for Windows that keeps a novel as a binder
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/corkboard.png" alt="Corkboard"><br><sub>Corkboard: scene cards with synopses, colour labels and word targets.</sub></td>
-    <td width="50%"><img src="docs/screenshots/full-text-search.png" alt="Full-text search"><br><sub>Full-text search across the library (SQLite FTS5), match in context.</sub></td>
+    <td width="50%"><img src="docs/screenshots/corkboard.png" alt="Corkboard"></td>
+    <td width="50%"><img src="docs/screenshots/full-text-search.png" alt="Full-text search"></td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/screenshots/snapshots-diff.png" alt="Snapshots"><br><sub>Snapshots: a line diff against an earlier version of a scene.</sub></td>
-    <td width="50%"><img src="docs/screenshots/export-compile.png" alt="Compile dialog"><br><sub>Compile: chapter headings and a title page, to Markdown or DOCX.</sub></td>
+    <td width="50%"><img src="docs/screenshots/snapshots-diff.png" alt="Snapshots"></td>
+    <td width="50%"><img src="docs/screenshots/export-compile.png" alt="Compile dialog"></td>
   </tr>
 </table>
 
