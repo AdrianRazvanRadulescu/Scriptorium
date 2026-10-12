@@ -2,12 +2,37 @@
 
 A calm local writing app for short stories and novels. Scrivener's structure, iA Writer's calm. Runs entirely offline, forever.
 
+Scriptorium is an offline desktop app for Windows that keeps a novel as a binder of plain Markdown scenes, with corkboard and outline views, snapshots, full-text search and Markdown/DOCX export. Built with Electron, React, TypeScript, CodeMirror 6, Zustand, Tailwind CSS and SQLite (FTS5); tested with Vitest and Playwright.
+
+<p align="center">
+  <img src="docs/screenshots/editor-and-binder.png" alt="Scriptorium: the binder next to the distraction-free editor" width="900">
+</p>
+
 - **A binder, not a folder.** Scenes and folders reorder by drag; the hierarchy lives in `project.json`, never in filenames. Corkboard and outline views over the same tree.
 - **Your prose stays yours.** Every scene is a plain `.md` file containing nothing but your words. Atomic writes, a daily zip backup, per-scene snapshots, and a crash journal that survives a hard kill.
 - **The Path.** An optional curriculum panel that walks a beginner from concrete description to a finished short story in six stages of small, checkable steps — beside the page, never inside it.
 - **Full-text search** across every scene in the library, via SQLite FTS5.
 - **Compile** a folder or a whole draft to Markdown or DOCX.
 - 16 themes, 7 typefaces, typewriter scrolling, focus mode, and a Romanian/English interface.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/corkboard.png" alt="Corkboard"><br><sub>Corkboard: scene cards with synopses, colour labels and word targets for one part.</sub></td>
+    <td width="50%"><img src="docs/screenshots/full-text-search.png" alt="Full-text search"><br><sub>Full-text search across the library (SQLite FTS5) with the match highlighted in context.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/snapshots-diff.png" alt="Snapshots"><br><sub>Snapshots panel with a line diff against an earlier version of a scene.</sub></td>
+    <td width="50%"><img src="docs/screenshots/export-compile.png" alt="Compile dialog"><br><sub>Compile dialog: chapter headings and a title page, exported to Markdown or DOCX.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/dark-theme.png" alt="Dark theme"><br><sub>The same editor in the dark "nocturne" theme.</sub></td>
+    <td></td>
+  </tr>
+</table>
+
+The screenshots use a fictional demo novel.
 
 ## Running in development
 
