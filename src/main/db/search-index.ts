@@ -75,16 +75,16 @@ export function searchIndex(db: Database.Database, query: SearchQuery): SearchHi
   const escapedText = '"' + query.text.replace(/"/g, '') + '"'
 
   let sql = `
-    SELECT s.project_id, s.project_dir, s.node_id, s.node_title,
-           snippet(s, 4, '<m>', '</m>', '...', 20) AS ctx
-    FROM scenes s
-    JOIN scene_meta m ON m.project_id = s.project_id AND m.node_id = s.node_id
-    WHERE s MATCH ?
+    SELECT scenes.project_id, scenes.project_dir, scenes.node_id, scenes.node_title,
+           snippet(scenes, 4, '<m>', '</m>', '...', 20) AS ctx
+    FROM scenes
+    JOIN scene_meta m ON m.project_id = scenes.project_id AND m.node_id = scenes.node_id
+    WHERE scenes MATCH ?
   `
   const params: string[] = [escapedText]
 
   if (query.projectId) {
-    sql += ' AND s.project_id = ?'
+    sql += ' AND scenes.project_id = ?'
     params.push(query.projectId)
   }
   if (query.status) {

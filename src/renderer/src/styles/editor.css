@@ -6,7 +6,7 @@
   line-height: var(--line-height-prose) !important;
   height: 100%;
 }
-.cm-scroller { overflow: auto !important; }
+.cm-scroller { overflow: auto !important; font-family: var(--font-prose) !important; }
 .cm-content { padding: 0 !important; caret-color: var(--color-accent); }
 .cm-line { padding: 0 !important; color: var(--color-prose); }
 .cm-cursor { border-left-color: var(--color-accent) !important; border-left-width: 2px !important; }
