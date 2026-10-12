@@ -17,6 +17,8 @@ Scriptorium is an offline desktop app for Windows that keeps a novel as a binder
 
 ## Screenshots
 
+![A tour of Scriptorium: editor, corkboard, search, snapshots, compile, dark theme](docs/screenshots/tour.gif)
+
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/corkboard.png" alt="Corkboard"><br><sub>Corkboard: scene cards with synopses, colour labels and word targets for one part.</sub></td>
